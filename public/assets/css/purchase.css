@@ -1,0 +1,351 @@
+/* ============================================
+   PURCHASE PAGE STYLING
+   ============================================ */
+
+:root {
+    --piplab-primary: #06a3da;
+    --piplab-accent: #39d5ff;
+    --piplab-dark: #091E3E;
+}
+
+.fw-700 { font-weight: 700 !important; }
+h2 { letter-spacing: -0.5px; }
+
+/* ============================================
+   ALERTS
+   ============================================ */
+
+.alert-notification {
+    animation: slideInDown 0.4s ease-out;
+    border-radius: 12px !important;
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   PURCHASE CARD
+   ============================================ */
+
+.purchase-card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid rgba(6, 163, 218, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.purchase-card:hover {
+    box-shadow: 0 8px 24px rgba(6, 163, 218, 0.12);
+    border-color: rgba(6, 163, 218, 0.15);
+}
+
+.purchase-card-header {
+    padding: 20px;
+    background: var(--piplab-dark);
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(6, 163, 218, 0.1);
+}
+
+.purchase-card-body { padding: 24px; }
+
+/* ============================================
+   PRICE DISPLAY
+   ============================================ */
+
+.price-display {
+    text-align: center;
+    padding: 16px 0;
+    margin-bottom: 24px;
+    border-bottom: 2px solid rgba(6, 163, 218, 0.1);
+}
+
+.price-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #999;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.price-value {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--piplab-primary);
+    line-height: 1;
+}
+
+.price-currency {
+    font-size: 12px;
+    color: #666;
+    margin-top: 6px;
+}
+
+.product-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(6, 163, 218, 0.1);
+    color: var(--piplab-primary);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   FEATURES LIST
+   ============================================ */
+
+.features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #333;
+}
+
+.feature i {
+    color: var(--piplab-primary);
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   STEP ITEMS
+   ============================================ */
+
+.step-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.step-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(6, 163, 218, 0.1);
+    color: var(--piplab-primary);
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.step-content h6 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--piplab-dark);
+    margin-bottom: 4px;
+}
+
+.step-content p {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+}
+
+/* ============================================
+   INSTRUCTION LISTS
+   ============================================ */
+
+.instruction-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.instruction-list li {
+    padding: 10px 0 10px 24px;
+    position: relative;
+    font-size: 13px;
+    color: #333;
+    line-height: 1.6;
+}
+
+.instruction-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--piplab-primary);
+}
+
+.instruction-list strong { color: var(--piplab-dark); }
+
+/* ============================================
+   FORM STYLING
+   ============================================ */
+
+.form-group { margin-bottom: 24px; }
+
+.form-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--piplab-dark);
+    margin-bottom: 8px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.form-control,
+.form-control-lg {
+    border: 1px solid rgba(6, 163, 218, 0.15);
+    border-radius: 10px;
+    font-size: 14px;
+    transition: all 0.25s ease;
+}
+
+.form-control:focus,
+.form-control-lg:focus {
+    border-color: var(--piplab-primary);
+    box-shadow: 0 0 0 3px rgba(6, 163, 218, 0.1);
+    outline: none;
+}
+
+.form-text { font-size: 12px; margin-top: 6px; }
+
+.input-group-lg .form-control { padding: 12px 14px; font-size: 13px; }
+.input-group-lg .copy-btn { border-radius: 10px !important; }
+
+/* ============================================
+   UPLOAD AREA
+   ============================================ */
+
+.upload-area {
+    border: 2px dashed rgba(6, 163, 218, 0.3);
+    border-radius: 10px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    background: rgba(6, 163, 218, 0.04);
+    position: relative;
+}
+
+.upload-area:hover {
+    border-color: var(--piplab-primary);
+    background: rgba(6, 163, 218, 0.08);
+}
+
+/* Hide the real file input - JS will trigger it */
+.upload-area input[type="file"] { display: none; }
+
+.upload-icon {
+    font-size: 40px;
+    color: var(--piplab-primary);
+    margin-bottom: 12px;
+}
+
+.upload-text p {
+    font-size: 13px;
+    color: var(--piplab-dark);
+    font-weight: 600;
+}
+
+.upload-text small { color: #999; font-size: 11px; }
+
+/* Optional: show selected filename */
+.upload-filename {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #555;
+    font-weight: 600;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.subscribe-btn,
+.submit-btn {
+    border-radius: 10px !important;
+    font-weight: 700;
+    padding: 14px 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.subscribe-btn:hover,
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(6, 163, 218, 0.3);
+}
+
+.copy-btn { font-weight: 600; }
+
+/* ============================================
+   EXAMPLE CARD
+   ============================================ */
+
+.example-card {
+    background: linear-gradient(135deg, rgba(6, 163, 218, 0.04) 0%, rgba(57, 213, 255, 0.02) 100%);
+}
+
+.rounded-12 { border-radius: 12px; }
+
+/* ============================================
+   CARD VARIANTS
+   ============================================ */
+
+.price-card { border: 2px solid rgba(6, 163, 218, 0.1); }
+
+.info-card .purchase-card-header,
+.form-card .purchase-card-header {
+    background: linear-gradient(135deg, #0582b8 0%, var(--piplab-primary) 100%);
+}
+
+.instruction-card .purchase-card-header {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+    .purchase-card-header { font-size: 14px; padding: 16px; }
+    .purchase-card-body { padding: 16px; }
+    .price-value { font-size: 32px; }
+    .step-item { gap: 12px; }
+    .step-number { width: 36px; height: 36px; font-size: 14px; }
+    .example-card { position: relative !important; top: auto !important; }
+}
+
+@media (max-width: 576px) {
+    h2 { font-size: 24px; }
+    .price-value { font-size: 28px; }
+    .form-control,
+    .form-control-lg { padding: 10px 12px; font-size: 13px; }
+    .upload-area { padding: 16px; }
+    .upload-icon { font-size: 32px; }
+}
