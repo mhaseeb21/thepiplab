@@ -9,10 +9,10 @@
                     <i class="bi bi-grid-fill"></i>
                     Our Services
                 </span>
-                <h2 class="tpl-h2 tpl-h2--dark mb-2">
+                <h2 class="tpl-h2 tpl-h2--dark mb-2" style="color:white">
                     Customized Solutions for Your Trading Success
                 </h2>
-                <p class="tpl-lead tpl-lead--dark mb-0">
+                <p class="tpl-lead tpl-lead--dark mb-0" style="color:white">
                     Built for clarity, consistency, and a clean client experience across markets.
                 </p>
             </div>

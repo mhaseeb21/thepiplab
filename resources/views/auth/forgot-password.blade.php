@@ -1,4 +1,4 @@
-@extends('layout_custom.app')
+@extends('layouts.app')
 
 @section('content')
 <div class="container mt-5" style="max-width: 520px;">
