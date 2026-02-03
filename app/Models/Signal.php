@@ -34,18 +34,10 @@ class Signal extends Model
      * DB stores: "uploads/xxx.png" (or sometimes just filename)
      * Public path: public_html/uploads/xxx.png
      */
-    public function getBeforeImageUrlAttribute(): string
-    {
-        if (!$this->image) return '';
-
-        // If already "uploads/..."
-        if (Str::startsWith($this->image, 'uploads/')) {
-            return asset($this->image);
-        }
-
-        // If only filename stored
-        return asset('uploads/' . $this->image);
-    }
+   public function getBeforeImageUrlAttribute(): string {
+    if (!$this->image) return '';
+    return url('uploads/' . ltrim($this->image, 'uploads/'));
+}
 
     /**
      * AFTER image url

@@ -35,16 +35,16 @@ class AdminSignalController extends Controller
         $signal->result_status = 'pending';
 
         // ✅ Always upload inside Laravel public/ so asset('uploads/...') works
-        $uploadsDir = public_path('uploads');
-        if (!is_dir($uploadsDir)) {
-            @mkdir($uploadsDir, 0775, true);
-        }
+       $uploadsDir = base_path('../public_html/uploads');
+if (!is_dir($uploadsDir)) {
+    @mkdir($uploadsDir, 0775, true);
+}
 
-        $beforeFilename = time() . '_' . Str::random(8) . '.' . $request->file('file')->extension();
-        $request->file('file')->move($uploadsDir, $beforeFilename);
+$beforeFilename = time() . '_' . Str::random(8) . '.' . $request->file('file')->extension();
+$request->file('file')->move($uploadsDir, $beforeFilename);
 
-        // ✅ store relative path for asset()
-        $signal->image = 'uploads/' . $beforeFilename;
+// Store just the relative path
+$signal->image = 'uploads/' . $beforeFilename;
 
         $signal->save();
 
