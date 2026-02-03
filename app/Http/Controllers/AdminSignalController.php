@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Signal;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AdminSignalController extends Controller
 {
@@ -44,10 +46,12 @@ class AdminSignalController extends Controller
         // Default status on create
         $signal->result_status = 'pending';
 
-        // Upload BEFORE image (your existing 'image' field)
-        $filename = time() . '_' . $request->file('file')->getClientOriginalName();
-        $request->file('file')->move(public_path('uploads'), $filename);
-        $signal->image = $filename;
+        // ✅ Store BEFORE image in storage/app/public/uploads
+        $beforeFilename = time() . '_' . Str::random(8) . '.' . $request->file('file')->extension();
+        $beforePath = $request->file('file')->storeAs('uploads', $beforeFilename, 'public');
+
+        // Save "uploads/filename.png" in DB
+        $signal->image = $beforePath;
 
         $signal->save();
 
@@ -78,11 +82,18 @@ class AdminSignalController extends Controller
         $signal = Signal::findOrFail($id);
         $signal->result_status = $request->result_status;
 
-        // Upload AFTER image (proof)
+        // ✅ Store AFTER image in storage/app/public/uploads
         if ($request->hasFile('after_image')) {
-            $afterName = time() . '_after_' . $request->file('after_image')->getClientOriginalName();
-            $request->file('after_image')->move(public_path('uploads'), $afterName);
-            $signal->after_image = $afterName;
+
+            // delete old after image (optional but recommended)
+            if ($signal->after_image && Storage::disk('public')->exists($signal->after_image)) {
+                Storage::disk('public')->delete($signal->after_image);
+            }
+
+            $afterFilename = time() . '_after_' . Str::random(8) . '.' . $request->file('after_image')->extension();
+            $afterPath = $request->file('after_image')->storeAs('uploads', $afterFilename, 'public');
+
+            $signal->after_image = $afterPath; // "uploads/xxx.png"
         }
 
         $signal->save();

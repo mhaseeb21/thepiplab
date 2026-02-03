@@ -14,8 +14,8 @@ class Signal extends Model
     protected $fillable = [
         'pair_name',
         'signal_type',
-        'image',          // before image
-        'after_image',    // after proof image
+        'image',
+        'after_image',
         'description',
         'tp1',
         'tp2',
@@ -29,24 +29,22 @@ class Signal extends Model
     ];
 
     /**
-     * BEFORE image url (uploads folder)
+     * BEFORE image url (storage symlink)
+     * image stored like: "uploads/xxxx.png"
      */
     public function getBeforeImageUrlAttribute(): string
     {
-        return asset('uploads/' . $this->image);
+        return asset('storage/' . $this->image);
     }
 
     /**
-     * AFTER image url (uploads folder)
+     * AFTER image url (storage symlink)
      */
     public function getAfterImageUrlAttribute(): ?string
     {
-        return $this->after_image ? asset('uploads/' . $this->after_image) : null;
+        return $this->after_image ? asset('storage/' . $this->after_image) : null;
     }
 
-    /**
-     * Result label for UI
-     */
     public function getResultLabelAttribute(): string
     {
         return match ($this->result_status) {
@@ -58,9 +56,6 @@ class Signal extends Model
         };
     }
 
-    /**
-     * Optional badge class for UI
-     */
     public function getResultBadgeClassAttribute(): string
     {
         return match ($this->result_status) {

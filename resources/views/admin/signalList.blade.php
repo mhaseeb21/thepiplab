@@ -42,6 +42,18 @@
 
                     <tbody>
                         @forelse($signals as $signal)
+
+                            @php
+                                // ✅ Support both formats:
+                                // New: image = "uploads/abc.png"
+                                // Old: image = "abc.png"
+                                $beforePath = $signal->image ? (str_starts_with($signal->image, 'uploads/') ? $signal->image : 'uploads/'.$signal->image) : null;
+                                $afterPath  = $signal->after_image ? (str_starts_with($signal->after_image, 'uploads/') ? $signal->after_image : 'uploads/'.$signal->after_image) : null;
+
+                                $beforeUrl = $beforePath ? asset('storage/'.$beforePath) : null;
+                                $afterUrl  = $afterPath ? asset('storage/'.$afterPath) : null;
+                            @endphp
+
                             <tr>
                                 {{-- ID --}}
                                 <td class="text-muted">{{ $signal->id }}</td>
@@ -51,7 +63,7 @@
 
                                 {{-- Type --}}
                                 <td>
-                                    <span class="badge bg-secondary text-uppercase">
+                                    <span class="badge {{ $signal->signal_type === 'buy' ? 'bg-success' : 'bg-danger' }} text-uppercase">
                                         {{ $signal->signal_type }}
                                     </span>
                                 </td>
@@ -73,23 +85,29 @@
 
                                 {{-- Before Image --}}
                                 <td>
-                                    <a href="{{ asset('uploads/'.$signal->image) }}" target="_blank">
-                                        <img
-                                            src="{{ asset('uploads/'.$signal->image) }}"
-                                            class="rounded border"
-                                            style="width:70px;height:45px;object-fit:cover;"
-                                        >
-                                    </a>
+                                    @if($beforeUrl)
+                                        <a href="{{ $beforeUrl }}" target="_blank">
+                                            <img
+                                                src="{{ $beforeUrl }}"
+                                                class="rounded border"
+                                                style="width:70px;height:45px;object-fit:cover;"
+                                                alt="Before Image"
+                                            >
+                                        </a>
+                                    @else
+                                        <span class="text-muted small">—</span>
+                                    @endif
                                 </td>
 
                                 {{-- After Image --}}
                                 <td>
-                                    @if($signal->after_image)
-                                        <a href="{{ asset('uploads/'.$signal->after_image) }}" target="_blank">
+                                    @if($afterUrl)
+                                        <a href="{{ $afterUrl }}" target="_blank">
                                             <img
-                                                src="{{ asset('uploads/'.$signal->after_image) }}"
+                                                src="{{ $afterUrl }}"
                                                 class="rounded border"
                                                 style="width:70px;height:45px;object-fit:cover;"
+                                                alt="After Image"
                                             >
                                         </a>
                                     @else
@@ -103,6 +121,7 @@
                                         @if($signal->result_status === 'pending') bg-warning
                                         @elseif($signal->result_status === 'tp_hit') bg-success
                                         @elseif($signal->result_status === 'sl_hit') bg-danger
+                                        @elseif($signal->result_status === 'entry_not_met') bg-info
                                         @else bg-secondary
                                         @endif
                                     ">
@@ -120,23 +139,11 @@
                                     >
                                         @csrf
 
-                                        <select
-                                            name="result_status"
-                                            class="form-select form-select-sm"
-                                            required
-                                        >
-                                            <option value="pending" {{ $signal->result_status=='pending'?'selected':'' }}>
-                                                Pending
-                                            </option>
-                                            <option value="tp_hit" {{ $signal->result_status=='tp_hit'?'selected':'' }}>
-                                                TP Hit
-                                            </option>
-                                            <option value="sl_hit" {{ $signal->result_status=='sl_hit'?'selected':'' }}>
-                                                SL Hit
-                                            </option>
-                                            <option value="entry_not_met" {{ $signal->result_status=='entry_not_met'?'selected':'' }}>
-                                                Entry Criteria Not Met
-                                            </option>
+                                        <select name="result_status" class="form-select form-select-sm" required>
+                                            <option value="pending" {{ $signal->result_status=='pending'?'selected':'' }}>Pending</option>
+                                            <option value="tp_hit" {{ $signal->result_status=='tp_hit'?'selected':'' }}>TP Hit</option>
+                                            <option value="sl_hit" {{ $signal->result_status=='sl_hit'?'selected':'' }}>SL Hit</option>
+                                            <option value="entry_not_met" {{ $signal->result_status=='entry_not_met'?'selected':'' }}>Entry Criteria Not Met</option>
                                         </select>
 
                                         <input

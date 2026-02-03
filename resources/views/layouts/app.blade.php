@@ -18,146 +18,14 @@
     {{-- Icons --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- TrustBox script -->
-<script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-<!-- End TrustBox script -->
 
     {{-- Bootstrap --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    {{-- ✅ Brand + base tokens + layout system --}}
-    <style>
-        :root{
-            --tpl-primary: #06a3da;
-            --tpl-accent:  #39d5ff;
-            --tpl-white:   #ffffff;
+    {{-- ✅ Your centralized CSS (ALL styles moved here) --}}
+    <link href="{{ asset('assets/css/app-modern.css') }}" rel="stylesheet">
 
-            --tpl-ink:     #0b1220;
-            --tpl-muted:   #667085;
-
-            /* ✅ CHANGED: base page bg is now solid white */
-            --tpl-bg:      #ffffff;
-
-            --tpl-card:    #ffffff;
-            --tpl-border:  rgba(2, 6, 23, .10);
-
-            --tpl-radius:  18px;
-            --tpl-shadow:  0 12px 32px rgba(2, 6, 23, .08);
-        }
-
-        /* Basic reset to prevent random gaps */
-        html, body{ height: 100%; }
-
-        /* ✅ CHANGED: body background is now pure white */
-        body{
-            margin: 0;
-            font-family: "Manrope", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-            background: #ffffff; /* ✅ pure white */
-            color: var(--tpl-ink);
-            text-rendering: optimizeLegibility;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        img{ max-width: 100%; height: auto; }
-
-        /* Ultra-wide safe wrapper */
-        .tpl-wrap{
-            max-width: 1280px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        @media (min-width: 1400px){ .tpl-wrap{ max-width: 1320px; } }
-        @media (min-width: 1800px){ .tpl-wrap{ max-width: 1480px; } }
-        @media (min-width: 2200px){ .tpl-wrap{ max-width: 1600px; } }
-
-        /* ======================================================
-           ✅ SECTION FLOW: NO GAPS BETWEEN SECTIONS
-           - wrappers have ZERO padding/margin
-           - spacing is handled INSIDE partials via tpl-section-inner
-           ====================================================== */
-        section{
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-
-        /* ✅ CHANGED: muted sections are also solid white (NO gradient) */
-        .section-muted{
-            background: #ffffff !important;
-            border: 0 !important;
-        }
-
-        /* ======================================================
-           ✅ INNER SPACING UTILITIES (use inside partials)
-           ====================================================== */
-        .tpl-section-inner{
-            padding-top: clamp(3rem, 6vw, 5rem);
-            padding-bottom: clamp(3rem, 6vw, 5rem);
-        }
-        .tpl-section-inner--sm{
-            padding-top: clamp(2.5rem, 5vw, 4rem);
-            padding-bottom: clamp(2.5rem, 5vw, 4rem);
-        }
-        .tpl-section-inner--lg{
-            padding-top: clamp(4rem, 8vw, 6.5rem);
-            padding-bottom: clamp(4rem, 8vw, 6.5rem);
-        }
-
-        /* Card helper (optional) */
-        .tpl-card{
-            background: var(--tpl-card);
-            border: 1px solid var(--tpl-border);
-            border-radius: var(--tpl-radius);
-            box-shadow: var(--tpl-shadow);
-        }
-
-        /* Button helper (optional) */
-        .btn-tpl{
-            background: var(--tpl-primary);
-            border-color: var(--tpl-primary);
-            color: #fff;
-            border-radius: 999px;
-            font-weight: 800;
-            padding: .8rem 1.1rem;
-        }
-        .btn-tpl:hover{
-            background: #058fbe;
-            border-color:#058fbe;
-            color:#fff;
-        }
-
-        .btn-tpl-outline{
-            background: transparent;
-            border: 1px solid var(--tpl-primary);
-            color: var(--tpl-primary);
-            border-radius: 999px;
-            font-weight: 800;
-            padding: .8rem 1.1rem;
-        }
-        .btn-tpl-outline:hover{
-            background: var(--tpl-primary);
-            color:#fff;
-        }
-
-        /* Back to top */
-        .tpl-backtop{
-            position: fixed;
-            right: 18px;
-            bottom: 18px;
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(10px);
-            transition: .2s ease;
-            z-index: 9999;
-        }
-        .tpl-backtop.show{
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateY(0);
-        }
-    </style>
-
-    {{-- ✅ page/partial CSS goes here --}}
+    {{-- ✅ page/partial extra CSS --}}
     @stack('head')
 
     {{-- Google tag --}}
@@ -169,7 +37,7 @@
         gtag('config', 'G-6NR944DQZ9');
     </script>
 
-    {{-- Trustpilot --}}
+    {{-- Trustpilot (ONLY ONCE) --}}
     <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
@@ -191,19 +59,36 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    {{-- ✅ Smooth mobile scroll + correct selector + passive listener --}}
     <script>
-        // Back to top button
         const btn = document.querySelector('.tpl-backtop');
-        window.addEventListener('scroll', () => {
-            btn?.classList.toggle('show', window.scrollY > 600);
-        });
-        btn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        const nav = document.querySelector('.tpl-nav');
 
-        // Navbar glass effect on scroll
-        const nav = document.querySelector('.tpl-navbar');
+        let ticking = false;
+
+        function updateOnScroll(){
+            const y = window.scrollY || 0;
+
+            if (btn) btn.classList.toggle('show', y > 600);
+
+            if (nav) {
+                const should = y > 10;
+                if (should !== nav.classList.contains('scrolled')) {
+                    nav.classList.toggle('scrolled', should);
+                }
+            }
+
+            ticking = false;
+        }
+
         window.addEventListener('scroll', () => {
-            nav?.classList.toggle('scrolled', window.scrollY > 10);
-        });
+            if (!ticking) {
+                requestAnimationFrame(updateOnScroll);
+                ticking = true;
+            }
+        }, { passive: true });
+
+        btn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     </script>
 
     @stack('scripts')
