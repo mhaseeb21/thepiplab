@@ -53,7 +53,7 @@
                                 <div class="carousel-inner">
 
                                     <div class="carousel-item active">
-                                        <img src="{{ asset('assets/img/carousel1.png') }}"
+                                        <img src="{{ asset('assets/img/carousel-1.png') }}"
                                              class="tpl-hero-img"
                                              alt="PipLab Platform">
                                     </div>
@@ -115,8 +115,6 @@
 
 </section>
 
-
-
 @once
 <style>
 /* ===== HERO BASE ===== */
@@ -144,6 +142,8 @@
     color:var(--tpl-primary);
     font-weight:900;
     font-size:.9rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
 }
 .tpl-h1{
     font-weight:950;
@@ -168,41 +168,48 @@
 .tpl-hero-media{
     position:relative;
 }
+
+/* ✅ FIX: Set height on carousel itself (responsive) */
 .tpl-hero-carousel{
-     position: relative; /* REQUIRED for overlay */
+    position: relative; /* REQUIRED for overlay */
     border-radius:24px;
     overflow:hidden;
     border:1px solid rgba(2,6,23,.10);
     background:#fff;
     box-shadow:0 40px 100px rgba(2,6,23,.12);
+
+    /* This controls the box height and makes images fill */
+    height: clamp(320px, 42vw, 480px);
 }
+
+/* Make inner/items match carousel height */
+.tpl-hero-carousel .carousel-inner,
+.tpl-hero-carousel .carousel-item{
+    height: 100%;
+}
+
 /* BLACKISH OVERLAY */
 .tpl-hero-carousel::after{
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.25); /* 👈 adjust opacity here */
-    pointer-events: none;         /* allows indicators to work */
+    background: rgba(0,0,0,0.25);
+    pointer-events: none;
     z-index: 2;
 }
 
-
-/* EXACT FIT IMAGE */
+/* ✅ FIX: Image fills full box always */
 .tpl-hero-img{
-    width:100%;
-    height:450px;
-    object-fit:cover;        /* ensures exact fit */
-    display:block;
-}
-
-/* Fix carousel height */
-.tpl-hero-carousel .carousel-inner{
-    aspect-ratio:16 / 11;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 /* INDICATORS ONLY */
 .tpl-hero-indicators{
     bottom:12px;
+    z-index: 3; /* above overlay */
 }
 .tpl-hero-indicators [data-bs-target]{
     width:8px;
@@ -240,12 +247,13 @@
 @media (max-width:991.98px){
     .tpl-hero-paragraph{ max-width:100%; }
 }
+
+/* Mobile fine-tune */
 @media (max-width:575.98px){
-    .tpl-hero-carousel .carousel-inner{
-        aspect-ratio:4 / 3;
+    .tpl-hero-carousel{
+        height: 300px;
+        border-radius: 18px;
     }
 }
-
-
 </style>
 @endonce

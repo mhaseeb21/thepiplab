@@ -9,7 +9,6 @@
 
     <meta name="keywords" content="Trading Services">
     <meta name="description" content="Financial Market Education">
-
     <link href="{{ asset('images/piplabLogo.png') }}" rel="icon">
 
     {{-- Fonts --}}
@@ -27,26 +26,23 @@
     {{-- Trustpilot --}}
     <script src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 
-    {{-- ======================================================
-         BASE DESIGN SYSTEM
-    ======================================================= --}}
     <style>
         :root{
             --tpl-primary: #06a3da;
             --tpl-accent: #39d5ff;
             --tpl-white: #ffffff;
+
             --tpl-ink: #0b1220;
             --tpl-muted: #667085;
+
             --tpl-border: rgba(2, 6, 23, .10);
             --tpl-radius: 18px;
             --tpl-shadow: 0 12px 32px rgba(2, 6, 23, .08);
         }
 
-        html, body{
-            height: 100%;
-        }
+        html, body{ height: 100%; }
 
-        body.tpl-body{
+        body{
             margin: 0;
             font-family: "Manrope", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
             background: #ffffff;
@@ -54,70 +50,23 @@
             text-rendering: optimizeLegibility;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
 
-            /* ✅ CRITICAL FIX */
+        img{ max-width: 100%; height: auto; }
+
+        /* ✅ Footer overlap FIX */
+        body.tpl-body{
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main.tpl-main{
+            flex: 1 1 auto;
         }
 
-        img{
-            max-width: 100%;
-            height: auto;
-        }
-
-        .tpl-main{
-            flex: 1 1 auto; /* ✅ pushes footer down */
-        }
-
-        section{
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-
-        .section-muted{
-            background: #ffffff;
-            border: 0 !important;
-        }
-
-        .tpl-section-inner{
-            padding-top: clamp(3rem, 6vw, 5rem);
-            padding-bottom: clamp(3rem, 6vw, 5rem);
-        }
-
-        .tpl-card{
-            background: #ffffff;
-            border: 1px solid var(--tpl-border);
-            border-radius: var(--tpl-radius);
-            box-shadow: var(--tpl-shadow);
-        }
-
-        .btn-tpl{
-            background: var(--tpl-primary);
-            border-color: var(--tpl-primary);
-            color: #fff;
-            border-radius: 999px;
-            font-weight: 800;
-            padding: .8rem 1.1rem;
-        }
-
-        .btn-tpl:hover{
-            background: #058fbe;
-            border-color:#058fbe;
-            color:#fff;
-        }
-
-        .btn-tpl-outline{
-            background: transparent;
-            border: 1px solid var(--tpl-primary);
-            color: var(--tpl-primary);
-            border-radius: 999px;
-            font-weight: 800;
-            padding: .8rem 1.1rem;
-        }
-
-        .btn-tpl-outline:hover{
-            background: var(--tpl-primary);
-            color:#fff;
-        }
+        /* ✅ IMPORTANT: DO NOT force .section-muted to white here
+           Because pages control their own section backgrounds. */
+        section{ padding: 0 !important; margin: 0 !important; }
 
         /* Back to top */
         .tpl-backtop{
@@ -130,7 +79,6 @@
             transition: .2s ease;
             z-index: 9999;
         }
-
         .tpl-backtop.show{
             opacity: 1;
             pointer-events: auto;
@@ -138,9 +86,10 @@
         }
     </style>
 
+    {{-- page/partial CSS goes here --}}
     @stack('head')
 
-    {{-- Google Analytics --}}
+    {{-- Google tag --}}
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6NR944DQZ9"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -150,11 +99,7 @@
     </script>
 </head>
 
-{{-- ======================================================
-     ✅ BODY STRUCTURE (FIXED)
-====================================================== --}}
-<body class="tpl-body d-flex flex-column">
-
+<body class="tpl-body">
     @include('partials.topbar_modern')
     @include('partials.navbar_modern')
     @include('partials.price_ticker_modern')
@@ -169,7 +114,6 @@
         <i class="bi bi-arrow-up"></i>
     </button>
 
-    {{-- Bootstrap JS --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -183,7 +127,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Navbar scroll effect
+        // Navbar scrolled state (make sure your nav uses class .tpl-nav)
         const nav = document.querySelector('.tpl-nav');
         window.addEventListener('scroll', () => {
             nav?.classList.toggle('scrolled', window.scrollY > 10);
