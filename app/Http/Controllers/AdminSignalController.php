@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Signal;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AdminSignalController extends Controller
@@ -19,7 +18,6 @@ class AdminSignalController extends Controller
 
     /**
      * CREATE signal (Before image + details)
-     * Route example: admin.signalUpload (POST)
      */
     public function store(Request $request)
     {
@@ -28,7 +26,6 @@ class AdminSignalController extends Controller
             'signal_type' => 'required|in:buy,sell',
             'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'description' => 'required|string|max:3000',
-
             'tp1' => 'nullable|string|max:50',
             'tp2' => 'nullable|string|max:50',
             'entry_criteria' => 'nullable|string|max:2000',
@@ -38,20 +35,22 @@ class AdminSignalController extends Controller
         $signal->pair_name = $request->pair_name;
         $signal->signal_type = $request->signal_type;
         $signal->description = $request->description;
-
         $signal->tp1 = $request->tp1;
         $signal->tp2 = $request->tp2;
         $signal->entry_criteria = $request->entry_criteria;
-
-        // Default status on create
         $signal->result_status = 'pending';
 
-        // ✅ Store BEFORE image in storage/app/public/uploads
-        $beforeFilename = time() . '_' . Str::random(8) . '.' . $request->file('file')->extension();
-        $beforePath = $request->file('file')->storeAs('uploads', $beforeFilename, 'public');
+        // ✅ Save to public_html/uploads
+        $uploadsDir = base_path('../domains/thepiplab.com/public_html/uploads');
+        if (!is_dir($uploadsDir)) {
+            @mkdir($uploadsDir, 0775, true);
+        }
 
-        // Save "uploads/filename.png" in DB
-        $signal->image = $beforePath;
+        $beforeFilename = time() . '_' . Str::random(8) . '.' . $request->file('file')->extension();
+        $request->file('file')->move($uploadsDir, $beforeFilename);
+
+        // Store relative public path in DB
+        $signal->image = 'uploads/' . $beforeFilename;
 
         $signal->save();
 
@@ -59,8 +58,7 @@ class AdminSignalController extends Controller
     }
 
     /**
-     * List all signals (Admin list page)
-     * Route example: admin.signals.show (GET)
+     * List all signals
      */
     public function show()
     {
@@ -69,8 +67,7 @@ class AdminSignalController extends Controller
     }
 
     /**
-     * UPDATE signal result status + optional after_image
-     * Route example: admin.signals.edit (POST) or (PATCH) with {id}
+     * UPDATE result status + optional after image
      */
     public function edit(Request $request, $id)
     {
@@ -82,18 +79,26 @@ class AdminSignalController extends Controller
         $signal = Signal::findOrFail($id);
         $signal->result_status = $request->result_status;
 
-        // ✅ Store AFTER image in storage/app/public/uploads
+        $uploadsDir = base_path('../domains/thepiplab.com/public_html/uploads');
+        if (!is_dir($uploadsDir)) {
+            @mkdir($uploadsDir, 0775, true);
+        }
+
+        // ✅ Save AFTER image in public_html/uploads
         if ($request->hasFile('after_image')) {
 
-            // delete old after image (optional but recommended)
-            if ($signal->after_image && Storage::disk('public')->exists($signal->after_image)) {
-                Storage::disk('public')->delete($signal->after_image);
+            // delete old file if exists
+            if ($signal->after_image) {
+                $old = base_path('../domains/thepiplab.com/public_html/' . ltrim($signal->after_image, '/'));
+                if (is_file($old)) {
+                    @unlink($old);
+                }
             }
 
             $afterFilename = time() . '_after_' . Str::random(8) . '.' . $request->file('after_image')->extension();
-            $afterPath = $request->file('after_image')->storeAs('uploads', $afterFilename, 'public');
+            $request->file('after_image')->move($uploadsDir, $afterFilename);
 
-            $signal->after_image = $afterPath; // "uploads/xxx.png"
+            $signal->after_image = 'uploads/' . $afterFilename;
         }
 
         $signal->save();

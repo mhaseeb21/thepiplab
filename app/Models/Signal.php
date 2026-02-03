@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Signal extends Model
 {
@@ -29,20 +30,35 @@ class Signal extends Model
     ];
 
     /**
-     * BEFORE image url (storage symlink)
-     * image stored like: "uploads/xxxx.png"
+     * BEFORE image url
+     * DB stores: "uploads/xxx.png" (or sometimes just filename)
+     * Public path: public_html/uploads/xxx.png
      */
     public function getBeforeImageUrlAttribute(): string
     {
-        return asset('storage/' . $this->image);
+        if (!$this->image) return '';
+
+        // If already "uploads/..."
+        if (Str::startsWith($this->image, 'uploads/')) {
+            return asset($this->image);
+        }
+
+        // If only filename stored
+        return asset('uploads/' . $this->image);
     }
 
     /**
-     * AFTER image url (storage symlink)
+     * AFTER image url
      */
     public function getAfterImageUrlAttribute(): ?string
     {
-        return $this->after_image ? asset('storage/' . $this->after_image) : null;
+        if (!$this->after_image) return null;
+
+        if (Str::startsWith($this->after_image, 'uploads/')) {
+            return asset($this->after_image);
+        }
+
+        return asset('uploads/' . $this->after_image);
     }
 
     public function getResultLabelAttribute(): string

@@ -42,18 +42,6 @@
 
                     <tbody>
                         @forelse($signals as $signal)
-
-                            @php
-                                // ✅ Support both formats:
-                                // New: image = "uploads/abc.png"
-                                // Old: image = "abc.png"
-                                $beforePath = $signal->image ? (str_starts_with($signal->image, 'uploads/') ? $signal->image : 'uploads/'.$signal->image) : null;
-                                $afterPath  = $signal->after_image ? (str_starts_with($signal->after_image, 'uploads/') ? $signal->after_image : 'uploads/'.$signal->after_image) : null;
-
-                                $beforeUrl = $beforePath ? asset('storage/'.$beforePath) : null;
-                                $afterUrl  = $afterPath ? asset('storage/'.$afterPath) : null;
-                            @endphp
-
                             <tr>
                                 {{-- ID --}}
                                 <td class="text-muted">{{ $signal->id }}</td>
@@ -85,10 +73,10 @@
 
                                 {{-- Before Image --}}
                                 <td>
-                                    @if($beforeUrl)
-                                        <a href="{{ $beforeUrl }}" target="_blank">
+                                    @if(!empty($signal->before_image_url))
+                                        <a href="{{ $signal->before_image_url }}" target="_blank">
                                             <img
-                                                src="{{ $beforeUrl }}"
+                                                src="{{ $signal->before_image_url }}"
                                                 class="rounded border"
                                                 style="width:70px;height:45px;object-fit:cover;"
                                                 alt="Before Image"
@@ -101,10 +89,10 @@
 
                                 {{-- After Image --}}
                                 <td>
-                                    @if($afterUrl)
-                                        <a href="{{ $afterUrl }}" target="_blank">
+                                    @if(!empty($signal->after_image_url))
+                                        <a href="{{ $signal->after_image_url }}" target="_blank">
                                             <img
-                                                src="{{ $afterUrl }}"
+                                                src="{{ $signal->after_image_url }}"
                                                 class="rounded border"
                                                 style="width:70px;height:45px;object-fit:cover;"
                                                 alt="After Image"
