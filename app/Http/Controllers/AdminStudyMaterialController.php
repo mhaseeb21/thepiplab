@@ -51,7 +51,7 @@ class AdminStudyMaterialController extends Controller
             'is_published'  => $request->boolean('is_published', true),
         ]);
 
-        return redirect()->route('admin.index')->with('success', 'Material uploaded successfully.');
+        return redirect()->route('admin.materials.create')->with('success', 'Material uploaded successfully.');
     }
 
     public function destroy(StudyMaterial $material)
