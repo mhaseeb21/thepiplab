@@ -8,17 +8,11 @@ use Illuminate\Support\Str;
 
 class AdminSignalController extends Controller
 {
-    /**
-     * Show upload form
-     */
     public function index()
     {
         return view('admin.signalUpload');
     }
 
-    /**
-     * CREATE signal (Before image + details)
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -40,8 +34,8 @@ class AdminSignalController extends Controller
         $signal->entry_criteria = $request->entry_criteria;
         $signal->result_status = 'pending';
 
-        // ✅ Save to public_html/uploads
-        $uploadsDir = base_path('../domains/thepiplab.com/public_html/uploads');
+        // ✅ Always upload inside Laravel public/ so asset('uploads/...') works
+        $uploadsDir = public_path('uploads');
         if (!is_dir($uploadsDir)) {
             @mkdir($uploadsDir, 0775, true);
         }
@@ -49,7 +43,7 @@ class AdminSignalController extends Controller
         $beforeFilename = time() . '_' . Str::random(8) . '.' . $request->file('file')->extension();
         $request->file('file')->move($uploadsDir, $beforeFilename);
 
-        // Store relative public path in DB
+        // ✅ store relative path for asset()
         $signal->image = 'uploads/' . $beforeFilename;
 
         $signal->save();
@@ -57,18 +51,12 @@ class AdminSignalController extends Controller
         return redirect()->back()->with('success', 'Signal uploaded successfully');
     }
 
-    /**
-     * List all signals
-     */
     public function show()
     {
         $signals = Signal::orderBy('created_at', 'desc')->get();
         return view('admin.signalList', compact('signals'));
     }
 
-    /**
-     * UPDATE result status + optional after image
-     */
     public function edit(Request $request, $id)
     {
         $request->validate([
@@ -79,19 +67,18 @@ class AdminSignalController extends Controller
         $signal = Signal::findOrFail($id);
         $signal->result_status = $request->result_status;
 
-        $uploadsDir = base_path('../domains/thepiplab.com/public_html/uploads');
+        $uploadsDir = public_path('uploads');
         if (!is_dir($uploadsDir)) {
             @mkdir($uploadsDir, 0775, true);
         }
 
-        // ✅ Save AFTER image in public_html/uploads
         if ($request->hasFile('after_image')) {
 
-            // delete old file if exists
+            // delete old if exists
             if ($signal->after_image) {
-                $old = base_path('../domains/thepiplab.com/public_html/' . ltrim($signal->after_image, '/'));
-                if (is_file($old)) {
-                    @unlink($old);
+                $oldPath = public_path(ltrim($signal->after_image, '/'));
+                if (is_file($oldPath)) {
+                    @unlink($oldPath);
                 }
             }
 
