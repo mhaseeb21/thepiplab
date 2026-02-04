@@ -31,16 +31,24 @@ class Signal extends Model
 
     /**
      * BEFORE image url
-     * DB stores: "uploads/xxx.png" (or sometimes just filename)
-     * Public path: public_html/uploads/xxx.png
+     * DB stores: "uploads/xxx.png"
+     * URL: /uploads/xxx.png
      */
-   public function getBeforeImageUrlAttribute(): string {
-    if (!$this->image) return '';
-    return url('uploads/' . ltrim($this->image, 'uploads/'));
-}
+    public function getBeforeImageUrlAttribute(): string
+    {
+        if (!$this->image) return '';
+
+        if (Str::startsWith($this->image, 'uploads/')) {
+            return asset($this->image);
+        }
+
+        return asset('uploads/' . $this->image);
+    }
 
     /**
      * AFTER image url
+     * DB stores: "uploads/xxx.png"
+     * URL: /uploads/xxx.png
      */
     public function getAfterImageUrlAttribute(): ?string
     {

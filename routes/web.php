@@ -135,8 +135,7 @@ Route::prefix('client')->group(function () {
         // Otherwise move it to auth+verified group below.
         Route::get('/portal', [ClientPortalController::class, 'index'])->name('client.portal');
 
-        // Logout (better as POST, but keeping as you have)
-        Route::get('/logout', [loginController::class, 'logout'])->name('client.logout');
+
 
 
 // NEW

@@ -7,7 +7,7 @@
             <div class="row gy-4 gy-lg-0 tpl-footer-main">
 
                 {{-- Brand --}}
-                <div class="col-12 col-lg-4">
+                <div class="col-12 col-md-6 col-lg-4">
                     <a href="{{ route('home') }}" class="tpl-footer-brand">
                         <img src="{{ asset('images/logo.png') }}" alt="ThePipLab">
                         <span>ThePipLab</span>
@@ -20,7 +20,7 @@
                 </div>
 
                 {{-- Contact --}}
-                <div class="col-6 col-lg-3">
+                <div class="col-12 col-md-6 col-lg-3">
                     <h6 class="tpl-footer-title">Get In Touch</h6>
 
                     <ul class="tpl-footer-list">
@@ -48,7 +48,7 @@
                 </div>
 
                 {{-- Quick Links --}}
-                <div class="col-6 col-lg-2">
+                <div class="col-12 col-md-6 col-lg-2">
                     <h6 class="tpl-footer-title">Quick Links</h6>
                     <ul class="tpl-footer-list">
                         <li><a href="{{ route('home') }}">Home</a></li>
@@ -59,7 +59,7 @@
                 </div>
 
                 {{-- Resources --}}
-                <div class="col-12 col-lg-3">
+                <div class="col-12 col-md-6 col-lg-3">
                     <h6 class="tpl-footer-title">Resources</h6>
                     <ul class="tpl-footer-list">
                         <li><a href="#testimonials">Testimonials</a></li>
@@ -162,6 +162,7 @@
 .tpl-footer-list a{
     color: rgba(255,255,255,.65);
     text-decoration: none;
+    word-break: break-word;
 }
 
 .tpl-footer-list a:hover{
@@ -210,10 +211,36 @@
     color: rgba(255,255,255,.6);
 }
 
-/* Mobile */
+/* Tablet adjustments */
+@media (max-width: 991.98px){
+    .tpl-footer-main{
+        padding-top: clamp(2rem, 5vw, 3rem);
+        padding-bottom: clamp(2rem, 5vw, 3rem);
+    }
+}
+
+/* Mobile adjustments */
 @media (max-width: 575.98px){
     .tpl-footer-text{
         max-width: 100%;
+    }
+
+    .tpl-footer-list li{
+        font-size: .85rem;
+        margin-bottom: 8px;
+    }
+
+    .tpl-footer-brand{
+        font-size: 1.1rem;
+    }
+
+    .tpl-footer-title{
+        font-size: .8rem;
+        margin-bottom: 10px;
+    }
+
+    .tpl-footer-main .col-md-6{
+        margin-bottom: 15px;
     }
 }
 </style>

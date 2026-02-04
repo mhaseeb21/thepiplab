@@ -146,13 +146,15 @@
         <div class="my-2 piplab-sb-divider"></div>
 
         {{-- Logout --}}
-        <a class="piplab-sb-link piplab-sb-link-danger" href="{{ route('client.logout') }}">
-            <span class="piplab-sb-link-left">
-                <i class="fas fa-right-from-bracket"></i>
-                Logout
-            </span>
-        </a>
-
+      <form method="POST" action="{{ route('client.logout') }}" class="m-0">
+    @csrf
+    <button type="submit" class="piplab-sb-link piplab-sb-link-danger border-0 bg-transparent w-100 text-start">
+        <span class="piplab-sb-link-left">
+            <i class="fas fa-right-from-bracket"></i>
+            Logout
+        </span>
+    </button>
+</form>
     </nav>
 
     {{-- Footer --}}

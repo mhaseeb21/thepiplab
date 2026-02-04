@@ -58,38 +58,38 @@ $signal->image = 'uploads/' . $beforeFilename;
     }
 
     public function edit(Request $request, $id)
-    {
-        $request->validate([
-            'result_status' => 'required|in:pending,tp_hit,sl_hit,entry_not_met',
-            'after_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+{
+    $request->validate([
+        'result_status' => 'required|in:pending,tp_hit,sl_hit,entry_not_met',
+        'after_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-        $signal = Signal::findOrFail($id);
-        $signal->result_status = $request->result_status;
+    $signal = Signal::findOrFail($id);
+    $signal->result_status = $request->result_status;
 
-        $uploadsDir = public_path('uploads');
-        if (!is_dir($uploadsDir)) {
-            @mkdir($uploadsDir, 0775, true);
-        }
-
-        if ($request->hasFile('after_image')) {
-
-            // delete old if exists
-            if ($signal->after_image) {
-                $oldPath = public_path(ltrim($signal->after_image, '/'));
-                if (is_file($oldPath)) {
-                    @unlink($oldPath);
-                }
-            }
-
-            $afterFilename = time() . '_after_' . Str::random(8) . '.' . $request->file('after_image')->extension();
-            $request->file('after_image')->move($uploadsDir, $afterFilename);
-
-            $signal->after_image = 'uploads/' . $afterFilename;
-        }
-
-        $signal->save();
-
-        return redirect()->route('admin.signals.show')->with('success', 'Signal updated successfully');
+    // ✅ Use same path as store() - public_html/uploads
+    $uploadsDir = base_path('../public_html/uploads');
+    if (!is_dir($uploadsDir)) {
+        @mkdir($uploadsDir, 0775, true);
     }
+
+    if ($request->hasFile('after_image')) {
+        // delete old if exists
+        if ($signal->after_image) {
+            $oldPath = base_path('../public_html/' . ltrim($signal->after_image, '/'));
+            if (is_file($oldPath)) {
+                @unlink($oldPath);
+            }
+        }
+
+        $afterFilename = time() . '_after_' . Str::random(8) . '.' . $request->file('after_image')->extension();
+        $request->file('after_image')->move($uploadsDir, $afterFilename);
+
+        $signal->after_image = 'uploads/' . $afterFilename;
+    }
+
+    $signal->save();
+
+    return redirect()->route('admin.signals.show')->with('success', 'Signal updated successfully');
+}
 }

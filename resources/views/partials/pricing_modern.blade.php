@@ -113,7 +113,7 @@
 
                         <div class="tpl-price-body">
                             <div class="tpl-price-amount">
-                                <span class="tpl-currency">$</span>500
+                                <span class="tpl-currency">$</span>50 - 50000
                             </div>
 
                             <ul class="tpl-price-list">

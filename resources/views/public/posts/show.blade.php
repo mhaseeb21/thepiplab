@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
-@section('content')
 @php
+    use Illuminate\Support\Str;
+
     $url = url()->current();
     $title = $post->title;
 
@@ -11,8 +12,28 @@
         'whatsapp' => 'https://wa.me/?text='.urlencode($title.' - '.$url),
         'x'        => 'https://twitter.com/intent/tweet?text='.urlencode($title).'&url='.urlencode($url),
     ];
+
+    // ✅ Social preview (WhatsApp/FB) needs OG tags (absolute URL)
+    $ogImage = $post->cover_image
+        ? asset('storage/'.$post->cover_image)
+        : asset('images/piplabLogo.png');
+
+    $ogDesc = $post->excerpt
+        ? Str::limit(strip_tags($post->excerpt), 160)
+        : Str::limit(strip_tags($post->content ?? ''), 160);
 @endphp
 
+{{-- ✅ These sections are used by your updated layout_custom/app.blade.php --}}
+@section('title', $post->title)
+@section('meta_description', $ogDesc)
+@section('canonical', $url)
+
+@section('og_type', 'article')
+@section('og_title', $post->title)
+@section('og_description', $ogDesc)
+@section('og_image', $ogImage)
+
+@section('content')
 <div class="container-fluid py-5 px-3 px-lg-4" style="max-width: 1200px;">
     <div class="row g-4">
 
@@ -91,7 +112,10 @@
                                 <div class="fw-800" style="color:#091E3E;">Markets</div>
                                 <div class="text-muted small">Live snapshot (cached)</div>
                             </div>
-                            <span id="mkUpdated" class="text-muted small"></span>
+                            <div class="text-end">
+                                <div id="mkUpdated" class="text-muted small"></div>
+                                <div id="mkStatus" class="text-muted small"></div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -105,7 +129,13 @@
                                         </tr>
                                     </thead>
                                     <tbody id="fxBody">
-                                        <tr><td colspan="2" class="text-muted small">Loading...</td></tr>
+                                        {{-- Skeleton rows (prevents layout jumping) --}}
+                                        @for($i=0; $i<5; $i++)
+                                            <tr class="mk-skel">
+                                                <td><span class="mk-skel-bar w-70"></span></td>
+                                                <td class="text-end"><span class="mk-skel-bar w-40"></span></td>
+                                            </tr>
+                                        @endfor
                                     </tbody>
                                 </table>
                             </div>
@@ -122,7 +152,15 @@
                                         </tr>
                                     </thead>
                                     <tbody id="idxBody">
-                                        <tr><td colspan="2" class="text-muted small">Loading...</td></tr>
+                                        @for($i=0; $i<4; $i++)
+                                            <tr class="mk-skel">
+                                                <td>
+                                                    <span class="mk-skel-bar w-80"></span>
+                                                    <div class="mt-1"><span class="mk-skel-bar w-50"></span></div>
+                                                </td>
+                                                <td class="text-end"><span class="mk-skel-bar w-35"></span></td>
+                                            </tr>
+                                        @endfor
                                     </tbody>
                                 </table>
                             </div>
@@ -140,18 +178,67 @@
 </div>
 @endsection
 
+@push('styles')
+<style>
+/* Keep markets area stable while loading */
+#fxBody, #idxBody { min-height: 180px; }
+
+/* Skeleton shimmer */
+.mk-skel .mk-skel-bar{
+    display:inline-block;
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+        rgba(2,6,23,.06) 25%,
+        rgba(2,6,23,.12) 37%,
+        rgba(2,6,23,.06) 63%
+    );
+    background-size: 400% 100%;
+    animation: mkShimmer 1.2s ease-in-out infinite;
+}
+@keyframes mkShimmer{
+    0%{ background-position: 100% 0; }
+    100%{ background-position: 0 0; }
+}
+.mk-skel td{ padding-top: .6rem; padding-bottom: .6rem; }
+
+/* widths */
+.w-80{ width:80%; }
+.w-70{ width:70%; }
+.w-50{ width:50%; }
+.w-40{ width:40%; }
+.w-35{ width:35%; }
+
+/* Fade-in for real rows */
+.mk-fade-in{ animation: mkFade .25s ease-out; }
+@keyframes mkFade{
+    from{ opacity:0; transform: translateY(2px); }
+    to{ opacity:1; transform: translateY(0); }
+}
+</style>
+@endpush
+
 @push('scripts')
 <script>
-(async function () {
-    try {
-        const res = await fetch("{{ route('market.widget') }}", { headers: { "Accept": "application/json" } });
-        const data = await res.json();
+(function () {
+    const endpoint = @json(route('market.widget'));
+    const LS_KEY = 'piplab_market_widget_v1';
+    const LS_MAX_AGE_MS = 5 * 60 * 1000; // 5 minutes
+    const FETCH_TIMEOUT_MS = 8000;
 
-        // Update time
-        document.getElementById('mkUpdated').textContent = data.updated_at ? ('Updated: ' + data.updated_at) : '';
+    const fxBody = document.getElementById('fxBody');
+    const idxBody = document.getElementById('idxBody');
+    const mkUpdated = document.getElementById('mkUpdated');
+    const mkStatus = document.getElementById('mkStatus');
+
+    function setStatus(text) {
+        if (mkStatus) mkStatus.textContent = text || '';
+    }
+
+    function render(data, { animate = false } = {}) {
+        if (mkUpdated) mkUpdated.textContent = data.updated_at ? ('Updated: ' + data.updated_at) : '';
 
         // FX
-        const fxBody = document.getElementById('fxBody');
         fxBody.innerHTML = '';
         (data.fx || []).forEach(row => {
             const val = (row.value === null || row.value === undefined)
@@ -159,20 +246,25 @@
                 : Number(row.value).toFixed(4);
 
             fxBody.insertAdjacentHTML('beforeend', `
-                <tr>
+                <tr class="${animate ? 'mk-fade-in' : ''}">
                     <td>${row.pair}</td>
                     <td class="text-end fw-semibold">${val}</td>
                 </tr>
             `);
         });
+        if (!data.fx?.length) {
+            fxBody.innerHTML = `<tr><td colspan="2" class="text-muted small">No FX data.</td></tr>`;
+        }
 
         // Indices
-        const idxBody = document.getElementById('idxBody');
         idxBody.innerHTML = '';
         (data.indices || []).forEach(row => {
-            const close = row.close ? Number(row.close).toLocaleString() : '-';
+            const close = (row.close === null || row.close === undefined || row.close === '')
+                ? '-'
+                : Number(row.close).toLocaleString();
+
             idxBody.insertAdjacentHTML('beforeend', `
-                <tr>
+                <tr class="${animate ? 'mk-fade-in' : ''}">
                     <td>
                         <div class="fw-semibold">${row.name}</div>
                         <div class="text-muted small">${row.date || ''}</div>
@@ -181,13 +273,79 @@
                 </tr>
             `);
         });
+        if (!data.indices?.length) {
+            idxBody.innerHTML = `<tr><td colspan="2" class="text-muted small">No indices data.</td></tr>`;
+        }
+    }
 
-        if (!data.fx?.length) fxBody.innerHTML = `<tr><td colspan="2" class="text-muted small">No FX data.</td></tr>`;
-        if (!data.indices?.length) idxBody.innerHTML = `<tr><td colspan="2" class="text-muted small">No indices data.</td></tr>`;
+    function loadFromLocalStorage() {
+        try {
+            const raw = localStorage.getItem(LS_KEY);
+            if (!raw) return false;
 
-    } catch (e) {
-        document.getElementById('fxBody').innerHTML = `<tr><td colspan="2" class="text-muted small">Failed to load.</td></tr>`;
-        document.getElementById('idxBody').innerHTML = `<tr><td colspan="2" class="text-muted small">Failed to load.</td></tr>`;
+            const parsed = JSON.parse(raw);
+            if (!parsed || !parsed.data || !parsed.saved_at) return false;
+
+            const age = Date.now() - parsed.saved_at;
+            if (age > LS_MAX_AGE_MS) return false;
+
+            render(parsed.data, { animate: false });
+            setStatus('Showing cached…');
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    async function fetchWithTimeout(url, timeoutMs) {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), timeoutMs);
+
+        try {
+            const res = await fetch(url, {
+                headers: { "Accept": "application/json" },
+                signal: controller.signal
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return await res.json();
+        } finally {
+            clearTimeout(t);
+        }
+    }
+
+    async function init() {
+        const hadCache = loadFromLocalStorage();
+
+        if (!hadCache) setStatus('Loading…');
+        else setStatus('Updating…');
+
+        try {
+            const data = await fetchWithTimeout(endpoint, FETCH_TIMEOUT_MS);
+
+            try {
+                localStorage.setItem(LS_KEY, JSON.stringify({
+                    saved_at: Date.now(),
+                    data: data
+                }));
+            } catch (_) {}
+
+            render(data, { animate: true });
+            setStatus('');
+        } catch (e) {
+            if (hadCache) {
+                setStatus('Update failed (showing cached)');
+                return;
+            }
+            fxBody.innerHTML = `<tr><td colspan="2" class="text-muted small">Failed to load.</td></tr>`;
+            idxBody.innerHTML = `<tr><td colspan="2" class="text-muted small">Failed to load.</td></tr>`;
+            setStatus('Failed');
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
 })();
 </script>

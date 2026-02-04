@@ -144,7 +144,9 @@
     font-size:.9rem;
     text-transform:uppercase;
     letter-spacing:.08em;
+    margin-bottom: 20px; /* ✅ SPACE AFTER KICKER */
 }
+
 .tpl-h1{
     font-weight:950;
     letter-spacing:-.03em;
@@ -152,12 +154,30 @@
     font-size:clamp(2.2rem,1.6rem + 2.2vw,3.5rem);
     color:#0b1220;
 }
+
 .tpl-hero-paragraph{
     font-size:1.06rem;
     line-height:1.65;
     color:rgba(11,18,32,.72);
     max-width:60ch;
 }
+
+/* ✅ FIX: Button styling */
+.btn-tpl{
+    background: var(--tpl-primary, #06a3da);
+    color: #fff;
+    border: none;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-tpl:hover{
+    background: #0587ba;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(6,163,218,.3);
+}
+
 .tpl-btn-lg{
     padding:.95rem 1.35rem;
     font-weight:950;

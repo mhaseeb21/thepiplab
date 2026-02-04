@@ -88,11 +88,15 @@
 
         <div class="my-2 piplab-sb-divider"></div>
 
-        {{-- Logout --}}
-        <a href="{{ route('admin.logout') }}"
-           class="piplab-sb-link piplab-sb-link-danger {{ Route::is('admin.logout') ? 'active' : '' }}">
-            <i class="fas fa-right-from-bracket me-2"></i> Logout
-        </a>
+        <form method="POST" action="{{ route('client.logout') }}" class="m-0">
+    @csrf
+    <button type="submit" class="piplab-sb-link piplab-sb-link-danger border-0 bg-transparent w-100 text-start">
+        <span class="piplab-sb-link-left">
+            <i class="fas fa-right-from-bracket"></i>
+            Logout
+        </span>
+    </button>
+</form>
 
     </nav>
 

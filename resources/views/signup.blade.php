@@ -109,8 +109,22 @@
                             <div class="tpl-field">
                                 <label class="tpl-label">Password</label>
                                 <div class="tpl-password">
-                                    <input type="password" class="tpl-input" id="password" name="password" required>
-                                    <button type="button" class="tpl-eye" onclick="togglePassword('password')">👁</button>
+                                    <input
+                                        type="password"
+                                        class="tpl-input"
+                                        id="password"
+                                        name="password"
+                                        required
+                                        autocomplete="new-password"
+                                    >
+                                    <button
+                                        type="button"
+                                        class="tpl-eye"
+                                        data-target="password"
+                                        aria-label="Toggle password visibility"
+                                    >
+                                        <i class="bi bi-eye"></i>
+                                    </button>
                                 </div>
                                 @error('password')
                                     <div class="tpl-error">{{ $message }}</div>
@@ -121,8 +135,22 @@
                             <div class="tpl-field">
                                 <label class="tpl-label">Confirm Password</label>
                                 <div class="tpl-password">
-                                    <input type="password" class="tpl-input" id="password_confirmation" name="password_confirmation" required>
-                                    <button type="button" class="tpl-eye" onclick="togglePassword('password_confirmation')">👁</button>
+                                    <input
+                                        type="password"
+                                        class="tpl-input"
+                                        id="password_confirmation"
+                                        name="password_confirmation"
+                                        required
+                                        autocomplete="new-password"
+                                    >
+                                    <button
+                                        type="button"
+                                        class="tpl-eye"
+                                        data-target="password_confirmation"
+                                        aria-label="Toggle password visibility"
+                                    >
+                                        <i class="bi bi-eye"></i>
+                                    </button>
                                 </div>
                                 @error('password_confirmation')
                                     <div class="tpl-error">{{ $message }}</div>
@@ -152,13 +180,21 @@
 {{-- ===== Styles ===== --}}
 @once
 <style>
-.tpl-auth{ background:#fff; }
+/* ✅ Fix #1: spacing from header/footer */
+.tpl-auth{
+    background:#fff;
+    padding-block: clamp(24px, 4vw, 56px); /* top+bottom spacing */
+    min-height: calc(100vh - 120px);       /* keeps it from sticking to footer */
+    display:flex;
+    align-items:center;
+}
 
 .tpl-auth-card{
     padding: 34px;
     border:1px solid rgba(2,6,23,.10);
     border-radius: 18px;
     box-shadow: 0 20px 60px rgba(2,6,23,.10);
+    background:#fff;
 }
 
 .tpl-auth-head{
@@ -177,9 +213,7 @@
     font-size:.95rem;
 }
 
-.tpl-field{
-    margin-bottom: 18px;
-}
+.tpl-field{ margin-bottom: 18px; }
 
 .tpl-label{
     font-weight:800;
@@ -200,31 +234,51 @@
     border-radius: 12px;
     border:1px solid rgba(2,6,23,.12);
     font-size:.95rem;
+    background:#fff;
 }
 
 .tpl-input:focus,
 .tpl-select:focus{
     outline:none;
     border-color: var(--tpl-primary);
+    box-shadow: 0 0 0 4px rgba(6,163,218,.12);
 }
 
 .tpl-phone{
     display:flex;
     gap:8px;
+    align-items:stretch;
 }
 
-.tpl-password{
-    position:relative;
-}
+.tpl-password{ position:relative; }
 
+/* ✅ Fix #2: better eye button + clickable */
 .tpl-eye{
     position:absolute;
-    right:12px;
+    right:10px;
     top:50%;
     transform:translateY(-50%);
-    background:none;
-    border:0;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid rgba(2,6,23,.10);
+    background: rgba(2,6,23,.02);
+    display:flex;
+    align-items:center;
+    justify-content:center;
     cursor:pointer;
+    color: rgba(11,18,32,.70);
+    padding:0;
+}
+.tpl-eye:hover{
+    background: rgba(6,163,218,.10);
+    border-color: rgba(6,163,218,.25);
+    color: #0b1220;
+}
+
+/* leave room for eye button */
+.tpl-password .tpl-input{
+    padding-right: 52px;
 }
 
 .tpl-help{
@@ -249,16 +303,46 @@
     color:#fff;
 }
 
-.tpl-btn-primary:hover{
-    background: var(--tpl-primary);
-}
+.tpl-btn-primary:hover{ background: var(--tpl-primary); }
 
 .tpl-auth-footer{
     text-align:center;
     margin-top:18px;
     font-size:.9rem;
 }
+.tpl-auth-footer a{
+    font-weight:900;
+    color:#0b1220;
+    text-decoration:none;
+}
+.tpl-auth-footer a:hover{ color: var(--tpl-primary); }
+
+@media (max-width: 575.98px){
+    .tpl-auth-card{ padding: 24px; }
+}
 </style>
+@endonce
+
+{{-- ✅ Fix #2: working toggle script --}}
+@once
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.tpl-eye[data-target]').forEach(function(btn){
+        btn.addEventListener('click', function () {
+            const targetId = btn.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const icon = btn.querySelector('i');
+            if (!input || !icon) return;
+
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+
+            icon.classList.toggle('bi-eye', !isPassword);
+            icon.classList.toggle('bi-eye-slash', isPassword);
+        });
+    });
+});
+</script>
 @endonce
 
 @endsection

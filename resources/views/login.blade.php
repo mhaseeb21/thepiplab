@@ -73,12 +73,16 @@
                                         required
                                         autocomplete="current-password"
                                     >
+
+                                    {{-- ✅ Better eye + working toggle --}}
                                     <button
                                         type="button"
                                         class="tpl-eye"
-                                        onclick="togglePassword()"
+                                        data-target="password"
                                         aria-label="Toggle password visibility"
-                                    >👁</button>
+                                    >
+                                        <i class="bi bi-eye"></i>
+                                    </button>
                                 </div>
 
                                 @error('password')
@@ -109,17 +113,22 @@
 
 @once
 <style>
-/* Uses your existing site tokens:
-   --tpl-primary, --tpl-ink, etc. from layout.
-*/
+/* ✅ spacing so it doesn't attach to header/footer */
+.tpl-auth{
+    background:#fff;
+    padding-block: clamp(24px, 4vw, 56px);
+    min-height: calc(100vh - 120px);
+    display:flex;
+    align-items:center;
+}
 
-.tpl-auth{ background:#fff; }
-
+/* Card */
 .tpl-auth-card{
     padding: 34px;
     border:1px solid rgba(2,6,23,.10);
     border-radius: 18px;
     box-shadow: 0 20px 60px rgba(2,6,23,.10);
+    background:#fff;
 }
 
 .tpl-auth-head{
@@ -158,7 +167,6 @@
     font-size:.95rem;
     background:#fff;
 }
-
 .tpl-input:focus{
     outline:none;
     border-color: var(--tpl-primary);
@@ -167,18 +175,31 @@
 
 .tpl-password{ position:relative; }
 
+/* ✅ Better eye button (and leave padding for it) */
+.tpl-password .tpl-input{ padding-right: 52px; }
+
 .tpl-eye{
     position:absolute;
-    right:12px;
+    right:10px;
     top:50%;
     transform:translateY(-50%);
-    background:none;
-    border:0;
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    border:1px solid rgba(2,6,23,.10);
+    background: rgba(2,6,23,.02);
+    display:flex;
+    align-items:center;
+    justify-content:center;
     cursor:pointer;
-    opacity:.75;
-    padding: 4px;
+    color: rgba(11,18,32,.70);
+    padding:0;
 }
-.tpl-eye:hover{ opacity:1; }
+.tpl-eye:hover{
+    background: rgba(6,163,218,.10);
+    border-color: rgba(6,163,218,.25);
+    color:#0b1220;
+}
 
 .tpl-link{
     font-size:.85rem;
@@ -200,11 +221,11 @@
     border-radius: 999px;
     font-weight:900;
     border:none;
-    background:#0b1220;          /* black default */
+    background:#0b1220;
     color:#fff;
 }
 .tpl-btn-primary:hover{
-    background: var(--tpl-primary);  /* blue hover */
+    background: var(--tpl-primary);
     color:#fff;
 }
 
@@ -219,23 +240,33 @@
     color:#0b1220;
     text-decoration:none;
 }
-.tpl-auth-footer a:hover{
-    color: var(--tpl-primary);
-}
+.tpl-auth-footer a:hover{ color: var(--tpl-primary); }
 
-/* Better spacing on small screens */
 @media (max-width: 575.98px){
     .tpl-auth-card{ padding: 24px; }
 }
 </style>
 @endonce
 
+@once
 <script>
-    function togglePassword() {
-        const passwordInput = document.getElementById('password');
-        if (!passwordInput) return;
-        passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-    }
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.tpl-eye[data-target]').forEach(function(btn){
+        btn.addEventListener('click', function () {
+            const targetId = btn.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const icon = btn.querySelector('i');
+            if (!input || !icon) return;
+
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+
+            icon.classList.toggle('bi-eye', !show);
+            icon.classList.toggle('bi-eye-slash', show);
+        });
+    });
+});
 </script>
+@endonce
 
 @endsection

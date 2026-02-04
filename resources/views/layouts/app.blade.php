@@ -5,11 +5,57 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'ThePipLab') }}</title>
 
-    <meta name="keywords" content="Trading Services">
-    <meta name="description" content="Financial Market Education">
+    {{-- ✅ Title + basic SEO --}}
+    <title>@yield('title', config('app.name', 'ThePipLab'))</title>
+    <meta name="keywords" content="@yield('meta_keywords', 'Trading Services')">
+    <meta name="description" content="@yield('meta_description', 'Financial Market Education')">
+
+    {{-- ✅ Canonical --}}
+    <link rel="canonical" href="@yield('canonical', url()->current())">
+
+    {{-- ✅ Favicon --}}
     <link href="{{ asset('images/piplabLogo.png') }}" rel="icon">
+
+    {{-- ✅ Default Open Graph / Twitter --}}
+    @php
+        $siteName = config('app.name', 'ThePipLab');
+
+        // WhatsApp prefers absolute https URLs
+        $pageUrl = url()->current();
+        $defaultOgImage = secure_url('images/piplabLogo.png');
+
+        $ogTitle = trim($__env->yieldContent('og_title')) ?: trim($__env->yieldContent('title')) ?: $siteName;
+        $ogDesc  = trim($__env->yieldContent('og_description')) ?: trim($__env->yieldContent('meta_description')) ?: 'Financial Market Education';
+
+        $ogImageRaw = trim($__env->yieldContent('og_image')) ?: $defaultOgImage;
+
+        // If page passes a relative path accidentally, force absolute
+        $ogImage = \Illuminate\Support\Str::startsWith($ogImageRaw, ['http://', 'https://'])
+            ? $ogImageRaw
+            : secure_url(ltrim($ogImageRaw, '/'));
+
+        $ogType  = trim($__env->yieldContent('og_type')) ?: 'website';
+    @endphp
+
+    <meta property="og:site_name" content="{{ $siteName }}">
+    <meta property="og:type" content="{{ $ogType }}">
+    <meta property="og:title" content="{{ $ogTitle }}">
+    <meta property="og:description" content="{{ $ogDesc }}">
+    <meta property="og:url" content="{{ $pageUrl }}">
+    <meta property="og:image" content="{{ $ogImage }}">
+    <meta property="og:image:secure_url" content="{{ $ogImage }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    {{-- ✅ FIXED: twitter meta (name="twitter:card") --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $ogTitle }}">
+    <meta name="twitter:description" content="{{ $ogDesc }}">
+    <meta name="twitter:image" content="{{ $ogImage }}">
+
+    {{-- ✅ Allow pages to override OG/Twitter tags if needed --}}
+    @stack('meta')
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,9 +110,7 @@
             flex: 1 1 auto;
         }
 
-        /* ✅ IMPORTANT: DO NOT force .section-muted to white here
-           Because pages control their own section backgrounds. */
-        section{ padding: 0 !important; margin: 0 !important; }
+        section{ margin: 0; }
 
         /* Back to top */
         .tpl-backtop{
@@ -127,7 +171,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
-        // Navbar scrolled state (make sure your nav uses class .tpl-nav)
+        // Navbar scrolled state
         const nav = document.querySelector('.tpl-nav');
         window.addEventListener('scroll', () => {
             nav?.classList.toggle('scrolled', window.scrollY > 10);
