@@ -113,7 +113,7 @@
 
                         <div class="tpl-price-body">
                             <div class="tpl-price-amount">
-                                <span class="tpl-currency">$</span>50 - 50000
+                                Price depends on strategy complexity & features
                             </div>
 
                             <ul class="tpl-price-list">
