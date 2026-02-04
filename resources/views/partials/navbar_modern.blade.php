@@ -88,7 +88,7 @@
                 </li>
 
                 <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
-                    <a href="https://wa.me/447377277480" class="btn tpl-cta" role="button">
+                    <a href="https://wa.me/447377277479" class="btn tpl-cta" role="button">
                         <i class="bi bi-whatsapp me-2"></i>Contact
                     </a>
                 </li>
