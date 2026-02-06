@@ -44,7 +44,7 @@
                                 @enderror
                             </div>
 
-                            {{-- Name --}}
+                            {{-- Full Name --}}
                             <div class="tpl-field">
                                 <label class="tpl-label">Full Name</label>
                                 <input type="text"
@@ -72,33 +72,66 @@
                                 @enderror
                             </div>
 
-                            {{-- Contact --}}
+                            {{-- Contact Number --}}
                             <div class="tpl-field">
                                 <label class="tpl-label">Contact Number</label>
 
+                                {{-- Country + phone --}}
                                 <div class="tpl-phone">
-                                    <select class="tpl-select" name="country_code" required>
-                                        <option value="+92" {{ old('country_code', '+92') == '+92' ? 'selected' : '' }}>🇵🇰 +92</option>
-                                        <option value="+44" {{ old('country_code') == '+44' ? 'selected' : '' }}>🇬🇧 +44</option>
-                                        <option value="+1"  {{ old('country_code') == '+1'  ? 'selected' : '' }}>🇺🇸 +1</option>
-                                        <option value="+971" {{ old('country_code') == '+971' ? 'selected' : '' }}>🇦🇪 +971</option>
-                                        <option value="+91" {{ old('country_code') == '+91' ? 'selected' : '' }}>🇮🇳 +91</option>
-                                    </select>
+                                    {{-- Custom Searchable Dropdown --}}
+                                    <div class="tpl-country-dropdown">
+                                        <input type="hidden" name="country_code" id="country_code_input" value="{{ old('country_code', '+92') }}">
+                                        
+                                        <button type="button" class="tpl-country-trigger" id="country_trigger">
+                                            <span class="tpl-country-selected" id="country_selected">
+                                                @php
+                                                    $defaultCode = old('country_code', '+92');
+                                                    $defaultCountry = collect(config('country_codes'))->firstWhere('code', $defaultCode);
+                                                @endphp
+                                                {{ $defaultCountry['flag'] ?? '🌍' }} {{ $defaultCountry['code'] ?? '+92' }}
+                                            </span>
+                                            <i class="bi bi-chevron-down"></i>
+                                        </button>
 
-                                    <input type="tel"
-                                           class="tpl-input"
-                                           id="contact"
-                                           name="contact"
-                                           placeholder="3001234567"
-                                           value="{{ old('contact') }}"
-                                           inputmode="numeric"
-                                           required>
+                                        <div class="tpl-country-panel" id="country_panel">
+                                            <div class="tpl-country-search-wrapper">
+                                                <i class="bi bi-search"></i>
+                                                <input
+                                                    type="text"
+                                                    id="country_search"
+                                                    class="tpl-country-search-input"
+                                                    placeholder="Search country..."
+                                                    autocomplete="off"
+                                                >
+                                            </div>
+
+                                            <div class="tpl-country-list" id="country_list">
+                                                @foreach (config('country_codes') as $country)
+                                                    <div class="tpl-country-option" 
+                                                         data-code="{{ $country['code'] }}"
+                                                         data-name="{{ $country['name'] }}"
+                                                         data-flag="{{ $country['flag'] }}">
+                                                        <span class="tpl-country-flag">{{ $country['flag'] }}</span>
+                                                        <span class="tpl-country-name">{{ $country['name'] }}</span>
+                                                        <span class="tpl-country-code">{{ $country['code'] }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <input
+                                        type="tel"
+                                        class="tpl-input"
+                                        name="contact"
+                                        placeholder="3001234567"
+                                        value="{{ old('contact') }}"
+                                        inputmode="numeric"
+                                        required
+                                    >
                                 </div>
 
                                 <div class="tpl-help">Digits only · 7–15 characters</div>
-                                <div class="tpl-error d-none" id="phone_error">
-                                    Please enter a valid phone number.
-                                </div>
 
                                 @error('contact')
                                     <div class="tpl-error">{{ $message }}</div>
@@ -117,12 +150,9 @@
                                         required
                                         autocomplete="new-password"
                                     >
-                                    <button
-                                        type="button"
-                                        class="tpl-eye"
-                                        data-target="password"
-                                        aria-label="Toggle password visibility"
-                                    >
+                                    <button type="button"
+                                            class="tpl-eye"
+                                            data-target="password">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
@@ -143,16 +173,23 @@
                                         required
                                         autocomplete="new-password"
                                     >
-                                    <button
-                                        type="button"
-                                        class="tpl-eye"
-                                        data-target="password_confirmation"
-                                        aria-label="Toggle password visibility"
-                                    >
+                                    <button type="button"
+                                            class="tpl-eye"
+                                            data-target="password_confirmation">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
                                 @error('password_confirmation')
+                                    <div class="tpl-error">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- Turnstile --}}
+                            <div class="tpl-field">
+                                <div class="cf-turnstile"
+                                     data-sitekey="{{ config('services.turnstile.site_key') }}">
+                                </div>
+                                @error('cf_turnstile_response')
                                     <div class="tpl-error">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -177,172 +214,334 @@
     </div>
 </section>
 
-{{-- ===== Styles ===== --}}
+@endsection
+
+
+{{-- ================= STYLES ================= --}}
 @once
 <style>
-/* ✅ Fix #1: spacing from header/footer */
 .tpl-auth{
     background:#fff;
-    padding-block: clamp(24px, 4vw, 56px); /* top+bottom spacing */
-    min-height: calc(100vh - 120px);       /* keeps it from sticking to footer */
+    padding-block: clamp(24px, 4vw, 56px);
+    min-height: calc(100vh - 120px);
     display:flex;
     align-items:center;
 }
 
 .tpl-auth-card{
-    padding: 34px;
+    padding:34px;
     border:1px solid rgba(2,6,23,.10);
-    border-radius: 18px;
-    box-shadow: 0 20px 60px rgba(2,6,23,.10);
-    background:#fff;
+    border-radius:18px;
+    box-shadow:0 20px 60px rgba(2,6,23,.10);
 }
 
-.tpl-auth-head{
-    text-align:center;
-    margin-bottom: 28px;
-}
+.tpl-auth-head{text-align:center;margin-bottom:28px}
+.tpl-auth-title{font-weight:950;letter-spacing:-.02em}
+.tpl-auth-sub{color:rgba(11,18,32,.65);font-size:.95rem}
 
-.tpl-auth-title{
-    font-weight:950;
-    letter-spacing:-.02em;
-    margin: 10px 0;
-}
+.tpl-field{margin-bottom:18px}
 
-.tpl-auth-sub{
-    color:rgba(11,18,32,.65);
-    font-size:.95rem;
-}
-
-.tpl-field{ margin-bottom: 18px; }
-
-.tpl-label{
-    font-weight:800;
-    font-size:.9rem;
-    margin-bottom:6px;
-    display:block;
-}
-
-.tpl-label span{
-    font-weight:600;
-    color:rgba(11,18,32,.55);
-}
-
-.tpl-input,
-.tpl-select{
+.tpl-label{font-weight:800;font-size:.9rem;margin-bottom:6px;display:block}
+.tpl-input,.tpl-select{
     width:100%;
     padding:12px 14px;
-    border-radius: 12px;
+    border-radius:12px;
     border:1px solid rgba(2,6,23,.12);
-    font-size:.95rem;
-    background:#fff;
 }
 
-.tpl-input:focus,
-.tpl-select:focus{
+.tpl-input:focus,.tpl-select:focus{
+    border-color:var(--tpl-primary);
+    box-shadow:0 0 0 4px rgba(6,163,218,.12);
     outline:none;
-    border-color: var(--tpl-primary);
-    box-shadow: 0 0 0 4px rgba(6,163,218,.12);
 }
 
 .tpl-phone{
-    display:flex;
-    gap:8px;
-    align-items:stretch;
+    display:grid;
+    grid-template-columns:170px 1fr;
+    gap:10px;
 }
 
-.tpl-password{ position:relative; }
+/* Custom Country Dropdown */
+.tpl-country-dropdown{
+    position:relative;
+}
 
-/* ✅ Fix #2: better eye button + clickable */
+.tpl-country-trigger{
+    width:100%;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid rgba(2,6,23,.12);
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+    transition:all 0.2s;
+}
+
+.tpl-country-trigger:hover{
+    border-color:rgba(2,6,23,.2);
+}
+
+.tpl-country-trigger:focus{
+    border-color:var(--tpl-primary);
+    box-shadow:0 0 0 4px rgba(6,163,218,.12);
+    outline:none;
+}
+
+.tpl-country-trigger i{
+    font-size:.75rem;
+    color:rgba(11,18,32,.5);
+    transition:transform 0.2s;
+}
+
+.tpl-country-trigger.active i{
+    transform:rotate(180deg);
+}
+
+.tpl-country-selected{
+    font-size:.9rem;
+    font-weight:600;
+}
+
+.tpl-country-panel{
+    position:absolute;
+    top:calc(100% + 4px);
+    left:0;
+    right:0;
+    background:#fff;
+    border:1px solid rgba(2,6,23,.12);
+    border-radius:12px;
+    box-shadow:0 10px 40px rgba(2,6,23,.15);
+    z-index:1000;
+    display:none;
+    overflow:hidden;
+}
+
+.tpl-country-panel.active{
+    display:block;
+}
+
+.tpl-country-search-wrapper{
+    position:relative;
+    padding:12px;
+    border-bottom:1px solid rgba(2,6,23,.08);
+}
+
+.tpl-country-search-wrapper i{
+    position:absolute;
+    left:24px;
+    top:50%;
+    transform:translateY(-50%);
+    color:rgba(11,18,32,.4);
+    font-size:.85rem;
+}
+
+.tpl-country-search-input{
+    width:100%;
+    padding:10px 12px 10px 36px;
+    border:1px solid rgba(2,6,23,.12);
+    border-radius:8px;
+    font-size:.9rem;
+}
+
+.tpl-country-search-input:focus{
+    border-color:var(--tpl-primary);
+    outline:none;
+}
+
+.tpl-country-list{
+    max-height:280px;
+    overflow-y:auto;
+}
+
+.tpl-country-option{
+    display:grid;
+    grid-template-columns:32px 1fr auto;
+    gap:10px;
+    align-items:center;
+    padding:10px 14px;
+    cursor:pointer;
+    transition:background 0.15s;
+}
+
+.tpl-country-option:hover{
+    background:rgba(6,163,218,.06);
+}
+
+.tpl-country-option.selected{
+    background:rgba(6,163,218,.1);
+}
+
+.tpl-country-flag{
+    font-size:1.2rem;
+}
+
+.tpl-country-name{
+    font-size:.9rem;
+    color:rgba(11,18,32,.85);
+}
+
+.tpl-country-code{
+    font-size:.85rem;
+    color:rgba(11,18,32,.6);
+    font-weight:600;
+}
+
+.tpl-country-option.hidden{
+    display:none;
+}
+
+.tpl-password{position:relative}
+
 .tpl-eye{
     position:absolute;
     right:10px;
     top:50%;
     transform:translateY(-50%);
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    border: 1px solid rgba(2,6,23,.10);
-    background: rgba(2,6,23,.02);
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    width:38px;height:38px;
+    border-radius:10px;
+    border:1px solid rgba(2,6,23,.1);
+    background:rgba(2,6,23,.02);
     cursor:pointer;
-    color: rgba(11,18,32,.70);
-    padding:0;
-}
-.tpl-eye:hover{
-    background: rgba(6,163,218,.10);
-    border-color: rgba(6,163,218,.25);
-    color: #0b1220;
 }
 
-/* leave room for eye button */
-.tpl-password .tpl-input{
-    padding-right: 52px;
-}
+.tpl-password .tpl-input{padding-right:52px}
 
-.tpl-help{
-    font-size:.8rem;
-    margin-top:4px;
-    color:rgba(11,18,32,.55);
-}
-
-.tpl-error{
-    font-size:.8rem;
-    color:#dc3545;
-    margin-top:4px;
-}
+.tpl-help{font-size:.8rem;color:rgba(11,18,32,.55);margin-top:6px}
+.tpl-error{font-size:.8rem;color:#dc3545;margin-top:4px}
 
 .tpl-btn-primary{
-    margin-top: 8px;
-    padding: .85rem 1rem;
-    border-radius: 999px;
-    font-weight:900;
+    margin-top:8px;
+    padding:.85rem;
+    border-radius:999px;
     border:none;
+    font-weight:900;
     background:#0b1220;
     color:#fff;
 }
 
-.tpl-btn-primary:hover{ background: var(--tpl-primary); }
+.tpl-btn-primary:hover{background:var(--tpl-primary)}
 
-.tpl-auth-footer{
-    text-align:center;
-    margin-top:18px;
-    font-size:.9rem;
-}
-.tpl-auth-footer a{
-    font-weight:900;
-    color:#0b1220;
-    text-decoration:none;
-}
-.tpl-auth-footer a:hover{ color: var(--tpl-primary); }
+.tpl-auth-footer{text-align:center;margin-top:18px}
 
-@media (max-width: 575.98px){
-    .tpl-auth-card{ padding: 24px; }
+@media(max-width:575px){
+    .tpl-auth-card{padding:24px}
+    .tpl-phone{grid-template-columns:1fr}
+    .tpl-country-trigger{font-size:.85rem}
 }
 </style>
 @endonce
 
-{{-- ✅ Fix #2: working toggle script --}}
+
+{{-- ================= SCRIPTS ================= --}}
 @once
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.tpl-eye[data-target]').forEach(function(btn){
-        btn.addEventListener('click', function () {
-            const targetId = btn.getAttribute('data-target');
-            const input = document.getElementById(targetId);
-            const icon = btn.querySelector('i');
-            if (!input || !icon) return;
+// Password toggle
+document.querySelectorAll('.tpl-eye').forEach(btn=>{
+    btn.onclick=()=>{
+        const i=document.getElementById(btn.dataset.target);
+        i.type=i.type==='password'?'text':'password';
+    }
+});
 
-            const isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password';
+// Country dropdown functionality
+document.addEventListener('DOMContentLoaded', () => {
+    const trigger = document.getElementById('country_trigger');
+    const panel = document.getElementById('country_panel');
+    const search = document.getElementById('country_search');
+    const list = document.getElementById('country_list');
+    const input = document.getElementById('country_code_input');
+    const selected = document.getElementById('country_selected');
+    const options = list.querySelectorAll('.tpl-country-option');
 
-            icon.classList.toggle('bi-eye', !isPassword);
-            icon.classList.toggle('bi-eye-slash', isPassword);
+    // Toggle dropdown
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = panel.classList.toggle('active');
+        trigger.classList.toggle('active');
+        
+        if (isActive) {
+            search.focus();
+        } else {
+            search.value = '';
+            options.forEach(opt => opt.classList.remove('hidden'));
+        }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+        if (!panel.contains(e.target) && e.target !== trigger) {
+            panel.classList.remove('active');
+            trigger.classList.remove('active');
+            search.value = '';
+            options.forEach(opt => opt.classList.remove('hidden'));
+        }
+    });
+
+    // Search functionality
+    search.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        options.forEach(option => {
+            const name = option.dataset.name.toLowerCase();
+            const code = option.dataset.code.toLowerCase();
+            
+            if (name.includes(query) || code.includes(query)) {
+                option.classList.remove('hidden');
+            } else {
+                option.classList.add('hidden');
+            }
         });
+    });
+
+    // Select country
+    options.forEach(option => {
+        option.addEventListener('click', () => {
+            const code = option.dataset.code;
+            const flag = option.dataset.flag;
+            
+            // Update hidden input
+            input.value = code;
+            
+            // Update trigger display
+            selected.innerHTML = `${flag} ${code}`;
+            
+            // Update selected state
+            options.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            
+            // Close panel
+            panel.classList.remove('active');
+            trigger.classList.remove('active');
+            search.value = '';
+            options.forEach(opt => opt.classList.remove('hidden'));
+        });
+    });
+
+    // Mark initially selected country
+    const initialCode = input.value;
+    options.forEach(option => {
+        if (option.dataset.code === initialCode) {
+            option.classList.add('selected');
+        }
+    });
+
+    // Prevent form submission when pressing Enter in search
+    search.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            
+            // Select first visible option
+            const firstVisible = list.querySelector('.tpl-country-option:not(.hidden)');
+            if (firstVisible) {
+                firstVisible.click();
+            }
+        }
     });
 });
 </script>
 @endonce
-
-@endsection
+</document_content>

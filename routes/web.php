@@ -67,11 +67,12 @@ Route::get('/api/market-widget', [MarketWidgetController::class, 'index'])->name
 
 
 // Forgot password (request reset link)
-Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])
-    ->name('password.request');
-
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])
+    ->middleware(['throttle:forgot-password', 'turnstile'])
     ->name('password.email');
+
+
+
 
 // Reset password (from email link)
 Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
@@ -123,10 +124,14 @@ Route::prefix('client')->group(function () {
     // Guest routes
     Route::middleware('guest')->group(function () {
         Route::get('/register/{referral_code?}', [signupController::class, 'index'])->name('client.register');
-        Route::post('/register', [signupController::class, 'register'])->name('store.register');
-
+        Route::post('/register', [signupController::class, 'register'])
+    ->middleware(['throttle:signup', 'turnstile'])
+    ->name('store.register');
         Route::get('/login', [loginController::class, 'index'])->name('client.login');
-        Route::post('/login', [loginController::class, 'login'])->name('login');
+        Route::post('/login', [loginController::class, 'login'])
+    ->middleware(['throttle:login', 'turnstile'])
+    ->name('login');
+
     });
 
     // Authenticated but NOT verified routes (allowed)

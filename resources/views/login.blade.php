@@ -58,7 +58,7 @@
                             <div class="tpl-field">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <label class="tpl-label mb-0" for="password">Password</label>
-                                    <a class="tpl-link" href="{{ route('password.request') }}">
+                                    <a class="tpl-link" href="{{ route('password.email') }}">
                                         Forgot password?
                                     </a>
                                 </div>
@@ -74,7 +74,6 @@
                                         autocomplete="current-password"
                                     >
 
-                                    {{-- ✅ Better eye + working toggle --}}
                                     <button
                                         type="button"
                                         class="tpl-eye"
@@ -86,6 +85,17 @@
                                 </div>
 
                                 @error('password')
+                                    <div class="tpl-error">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- ✅ Turnstile --}}
+                            <div class="tpl-field">
+                                <div class="cf-turnstile"
+                                     data-sitekey="{{ config('services.turnstile.site_key') }}">
+                                </div>
+
+                                @error('cf_turnstile_response')
                                     <div class="tpl-error">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -111,7 +121,12 @@
     </div>
 </section>
 
+
+
+
+
 @once
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
 /* ✅ spacing so it doesn't attach to header/footer */
 .tpl-auth{

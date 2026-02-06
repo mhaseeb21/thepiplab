@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.auth'  => \App\Http\Middleware\AdminAuthenticate::class,
             'verified'    => EnsureEmailIsVerified::class,
              'student.course' => \App\Http\Middleware\EnsureCourseEnrolled::class,
+             'turnstile' => \App\Http\Middleware\VerifyTurnstile::class,
         ]);
 
         // ✅ Make redirect smart (admin vs client)

@@ -26,11 +26,33 @@
 
                 <div class="mb-3">
                     <label class="form-label">Email address</label>
-                    <input type="email" name="email" class="form-control" required autofocus>
+                    <input
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        value="{{ old('email') }}"
+                        required
+                        autofocus
+                    >
+                </div>
+
+                {{-- ✅ Turnstile --}}
+                <div class="mb-3">
+                    <div class="cf-turnstile"
+                         data-sitekey="{{ config('services.turnstile.site_key') }}">
+                    </div>
+
+                    @error('cf_turnstile_response')
+                        <div class="text-danger small mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
 
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Send Reset Link</button>
+                    <button type="submit" class="btn btn-primary">
+                        Send Reset Link
+                    </button>
                 </div>
 
                 <div class="text-center mt-3">
@@ -40,4 +62,10 @@
         </div>
     </div>
 </div>
+
+{{-- ✅ Turnstile script (load once) --}}
+@once
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+@endonce
+
 @endsection
