@@ -280,4 +280,9 @@ Route::get('/signals-access', [AdminSignalsAccessController::class, 'index'])
 
         });
       });
+      
+});
+// ✅ Catch-all (MUST be last, OUTSIDE groups)
+Route::fallback(function () {
+    return redirect()->route('home');
 });
