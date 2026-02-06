@@ -16,29 +16,37 @@ class loginController extends Controller
     public function login(Request $request)
     {
         try {
-            // Basic validation (no error details exposed)
-            if (!$request->filled('email') || !$request->filled('password')) {
-                return back()
-                    ->withInput($request->only('email'))
-                    ->with('error', 'Please enter both email and password.');
-            }
+            // ✅ Validate inputs properly (+ turnstile token)
+            $request->validate([
+                'email'                 => 'required|email',
+                'password'              => 'required|string',
+                'cf-turnstile-response' => 'required|string',
+            ]);
 
             // Attempt login
             if (Auth::attempt([
                 'email' => $request->email,
                 'password' => $request->password
             ])) {
+
                 $request->session()->regenerate();
+
+                // ✅ If not verified, send to verification notice
+                if (Auth::user() && !Auth::user()->hasVerifiedEmail()) {
+                    return redirect()->route('verification.notice');
+                }
+
                 return redirect()->route('client.dashboard');
             }
 
-            // ❌ Wrong credentials (generic message)
             return back()
                 ->withInput($request->only('email'))
                 ->with('error', 'Your email or password is incorrect.');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+
         } catch (\Throwable $e) {
-            // 🔒 Log real error, hide from user
             Log::error('Login error', [
                 'message' => $e->getMessage(),
             ]);
@@ -48,11 +56,12 @@ class loginController extends Controller
         }
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect()->route('client.login');
     }

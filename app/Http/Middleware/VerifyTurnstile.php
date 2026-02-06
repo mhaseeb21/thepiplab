@@ -28,7 +28,7 @@ class VerifyTurnstile
 
         if (empty($verify['success'])) {
             return back()->withInput()->withErrors([
-                'cf_turnstile_response' => 'Verification failed. Please try again.'
+                'cf-turnstile-response' => 'Verification failed. Please try again.'
             ]);
         }
 
