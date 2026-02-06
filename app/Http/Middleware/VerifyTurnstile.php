@@ -10,26 +10,42 @@ class VerifyTurnstile
 {
     public function handle(Request $request, Closure $next)
     {
-        // If token missing
-        if (!$request->filled('cf_turnstile_response')) {
-            return back()->withInput()->withErrors([
-                'cf_turnstile_response' => 'Please complete the verification.'
-            ]);
+        // ✅ allow local development without turnstile
+        if (app()->environment('local')) {
+            return $next($request);
         }
 
-        $verify = Http::asForm()->post(
+        $token = $request->input('cf-turnstile-response');
+
+        if (!$token) {
+            return back()
+                ->withInput()
+                ->withErrors(['cf-turnstile-response' => 'Please complete the verification.']);
+        }
+
+        $secret = config('services.turnstile.secret');
+
+        if (!$secret) {
+            return back()
+                ->withInput()
+                ->withErrors(['cf-turnstile-response' => 'Turnstile secret key is missing on server.']);
+        }
+
+        $response = Http::asForm()->post(
             'https://challenges.cloudflare.com/turnstile/v0/siteverify',
             [
-                'secret'   => config('services.turnstile.secret'),
-                'response' => $request->input('cf_turnstile_response'),
+                'secret'   => $secret,
+                'response' => $token,
                 'remoteip' => $request->ip(),
             ]
-        )->json();
+        );
 
-        if (empty($verify['success'])) {
-            return back()->withInput()->withErrors([
-                'cf-turnstile-response' => 'Verification failed. Please try again.'
-            ]);
+        $data = $response->json();
+
+        if (!($data['success'] ?? false)) {
+            return back()
+                ->withInput()
+                ->withErrors(['cf-turnstile-response' => 'Verification failed. Please try again.']);
         }
 
         return $next($request);
