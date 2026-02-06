@@ -42,7 +42,7 @@
                          data-sitekey="{{ config('services.turnstile.site_key') }}">
                     </div>
 
-                    @error('cf_turnstile_response')
+                    @error('cf-turnstile-response')
                         <div class="text-danger small mt-1">
                             {{ $message }}
                         </div>
