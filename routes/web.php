@@ -70,7 +70,10 @@ Route::get('/api/market-widget', [MarketWidgetController::class, 'index'])->name
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])
     ->middleware(['throttle:forgot-password', 'turnstile'])
     ->name('password.email');
-
+// Show forgot password form
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])
+    ->middleware('guest')
+    ->name('password.request');
 
 
 

@@ -58,7 +58,7 @@
                             <div class="tpl-field">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
                                     <label class="tpl-label mb-0" for="password">Password</label>
-                                    <a class="tpl-link" href="{{ route('password.email') }}">
+                                    <a class="tpl-link" href="{{ route('password.request') }}">
                                         Forgot password?
                                     </a>
                                 </div>
