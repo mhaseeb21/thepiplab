@@ -29,7 +29,7 @@
             <a href="{{ route('home') }}" class="btn tpl-btn tpl-btn-ghost">
                 <i class="fas fa-globe me-2"></i>Website
             </a>
-            <a href="https://wa.me/447538005864" class="btn tpl-btn tpl-btn-primary" target="_blank" rel="noopener">
+            <a href="https://wa.me/447377277479" class="btn tpl-btn tpl-btn-primary" target="_blank" rel="noopener">
                 <i class="fas fa-message me-2"></i>Contact
             </a>
         </div>

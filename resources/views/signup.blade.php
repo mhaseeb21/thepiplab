@@ -17,7 +17,7 @@
                                 <i class="bi bi-person-plus-fill"></i>
                                 Create Account
                             </span>
-                            <h1 class="tpl-auth-title">Join PipLab</h1>
+                            <h1 class="tpl-auth-title">Join The PipLab</h1>
                             <p class="tpl-auth-sub">
                                 Create your account to access market insights, tools, and education.
                             </p>
@@ -81,7 +81,7 @@
                                     {{-- Custom Searchable Dropdown --}}
                                     <div class="tpl-country-dropdown">
                                         <input type="hidden" name="country_code" id="country_code_input" value="{{ old('country_code', '+92') }}">
-                                        
+
                                         <button type="button" class="tpl-country-trigger" id="country_trigger">
                                             <span class="tpl-country-selected" id="country_selected">
                                                 @php
@@ -107,7 +107,7 @@
 
                                             <div class="tpl-country-list" id="country_list">
                                                 @foreach (config('country_codes') as $country)
-                                                    <div class="tpl-country-option" 
+                                                    <div class="tpl-country-option"
                                                          data-code="{{ $country['code'] }}"
                                                          data-name="{{ $country['name'] }}"
                                                          data-flag="{{ $country['flag'] }}">
@@ -152,7 +152,8 @@
                                     >
                                     <button type="button"
                                             class="tpl-eye"
-                                            data-target="password">
+                                            data-target="password"
+                                            aria-label="Show password">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
@@ -175,7 +176,8 @@
                                     >
                                     <button type="button"
                                             class="tpl-eye"
-                                            data-target="password_confirmation">
+                                            data-target="password_confirmation"
+                                            aria-label="Show confirm password">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
@@ -404,6 +406,9 @@
     border:1px solid rgba(2,6,23,.1);
     background:rgba(2,6,23,.02);
     cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 .tpl-password .tpl-input{padding-right:52px}
@@ -439,109 +444,114 @@
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <script>
-// Password toggle
-document.querySelectorAll('.tpl-eye').forEach(btn=>{
-    btn.onclick=()=>{
-        const i=document.getElementById(btn.dataset.target);
-        i.type=i.type==='password'?'text':'password';
-    }
-});
-
-// Country dropdown functionality
 document.addEventListener('DOMContentLoaded', () => {
-    const trigger = document.getElementById('country_trigger');
-    const panel = document.getElementById('country_panel');
-    const search = document.getElementById('country_search');
-    const list = document.getElementById('country_list');
-    const input = document.getElementById('country_code_input');
-    const selected = document.getElementById('country_selected');
-    const options = list.querySelectorAll('.tpl-country-option');
 
-    // Toggle dropdown
-    trigger.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const isActive = panel.classList.toggle('active');
-        trigger.classList.toggle('active');
-        
-        if (isActive) {
-            search.focus();
-        } else {
-            search.value = '';
-            options.forEach(opt => opt.classList.remove('hidden'));
-        }
-    });
+    // ✅ Password show/hide (fixed: binds after DOM is ready)
+    document.querySelectorAll('.tpl-eye').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const input = document.getElementById(btn.dataset.target);
+            if (!input) return;
 
-    // Close on outside click
-    document.addEventListener('click', (e) => {
-        if (!panel.contains(e.target) && e.target !== trigger) {
-            panel.classList.remove('active');
-            trigger.classList.remove('active');
-            search.value = '';
-            options.forEach(opt => opt.classList.remove('hidden'));
-        }
-    });
+            const icon = btn.querySelector('i');
 
-    // Search functionality
-    search.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase().trim();
-        
-        options.forEach(option => {
-            const name = option.dataset.name.toLowerCase();
-            const code = option.dataset.code.toLowerCase();
-            
-            if (name.includes(query) || code.includes(query)) {
-                option.classList.remove('hidden');
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (icon) {
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                }
             } else {
-                option.classList.add('hidden');
+                input.type = 'password';
+                if (icon) {
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                }
             }
         });
     });
 
-    // Select country
-    options.forEach(option => {
-        option.addEventListener('click', () => {
-            const code = option.dataset.code;
-            const flag = option.dataset.flag;
-            
-            // Update hidden input
-            input.value = code;
-            
-            // Update trigger display
-            selected.innerHTML = `${flag} ${code}`;
-            
-            // Update selected state
-            options.forEach(opt => opt.classList.remove('selected'));
-            option.classList.add('selected');
-            
-            // Close panel
-            panel.classList.remove('active');
-            trigger.classList.remove('active');
-            search.value = '';
-            options.forEach(opt => opt.classList.remove('hidden'));
-        });
-    });
+    // ✅ Country dropdown functionality
+    const trigger = document.getElementById('country_trigger');
+    const panel   = document.getElementById('country_panel');
+    const search  = document.getElementById('country_search');
+    const list    = document.getElementById('country_list');
+    const input   = document.getElementById('country_code_input');
+    const selected= document.getElementById('country_selected');
+    const options = list ? list.querySelectorAll('.tpl-country-option') : [];
 
-    // Mark initially selected country
-    const initialCode = input.value;
-    options.forEach(option => {
-        if (option.dataset.code === initialCode) {
-            option.classList.add('selected');
-        }
-    });
+    if (trigger && panel && search && list && input && selected) {
 
-    // Prevent form submission when pressing Enter in search
-    search.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            
-            // Select first visible option
-            const firstVisible = list.querySelector('.tpl-country-option:not(.hidden)');
-            if (firstVisible) {
-                firstVisible.click();
+        // Toggle dropdown
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isActive = panel.classList.toggle('active');
+            trigger.classList.toggle('active');
+
+            if (isActive) {
+                search.focus();
+            } else {
+                search.value = '';
+                options.forEach(opt => opt.classList.remove('hidden'));
             }
-        }
-    });
+        });
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!panel.contains(e.target) && e.target !== trigger) {
+                panel.classList.remove('active');
+                trigger.classList.remove('active');
+                search.value = '';
+                options.forEach(opt => opt.classList.remove('hidden'));
+            }
+        });
+
+        // Search functionality
+        search.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+
+            options.forEach(option => {
+                const name = (option.dataset.name || '').toLowerCase();
+                const code = (option.dataset.code || '').toLowerCase();
+                option.classList.toggle('hidden', !(name.includes(query) || code.includes(query)));
+            });
+        });
+
+        // Select country
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                const code = option.dataset.code;
+                const flag = option.dataset.flag;
+
+                input.value = code;
+                selected.innerHTML = `${flag} ${code}`;
+
+                options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+
+                panel.classList.remove('active');
+                trigger.classList.remove('active');
+                search.value = '';
+                options.forEach(opt => opt.classList.remove('hidden'));
+            });
+        });
+
+        // Mark initially selected country
+        const initialCode = input.value;
+        options.forEach(option => {
+            if (option.dataset.code === initialCode) {
+                option.classList.add('selected');
+            }
+        });
+
+        // Prevent form submission when pressing Enter in search
+        search.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const firstVisible = list.querySelector('.tpl-country-option:not(.hidden)');
+                if (firstVisible) firstVisible.click();
+            }
+        });
+    }
 });
 </script>
 @endonce
-</document_content>

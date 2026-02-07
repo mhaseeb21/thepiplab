@@ -59,7 +59,7 @@
         <div class="service-card-wrapper">
             <div class="service-card signals-card">
                 <div class="service-card-image">
-                    <img src="{{ asset('images/signal.png') }}" alt="Premium Signals" class="service-image">
+                    <img src="{{ asset('images/signals.webp') }}" alt="Premium Signals" class="service-image">
                     <div class="service-overlay">
                         <div class="overlay-badge">
                             <i class="fas fa-bolt"></i>
@@ -133,7 +133,7 @@
         <div class="service-card-wrapper">
             <div class="service-card education-card">
                 <div class="service-card-image">
-                    <img src="{{ asset('images/education.png') }}" alt="Education Program" class="service-image">
+                    <img src="{{ asset('images/education.webp') }}" alt="Education Program" class="service-image">
                     <div class="service-overlay">
                         <div class="overlay-badge">
                             <i class="fas fa-book"></i>
@@ -207,7 +207,7 @@
         <div class="service-card-wrapper">
             <div class="service-card bots-card">
                 <div class="service-card-image">
-                    <img src="{{ asset('images/bots.png') }}" alt="Bots / Strategies" class="service-image">
+                    <img src="{{ asset('images/bots.webp') }}" alt="Bots / Strategies" class="service-image">
                     <div class="service-overlay">
                         <div class="overlay-badge">
                             <i class="fas fa-robot"></i>
