@@ -53,19 +53,19 @@
                                 <div class="carousel-inner">
 
                                     <div class="carousel-item active">
-                                        <img src="{{ asset('assets/img/carousel-1.png') }}"
+                                        <img src="{{ asset('assets/img/carousel-1.webp') }}"
                                              class="tpl-hero-img"
                                              alt="PipLab Platform">
                                     </div>
 
                                     <div class="carousel-item">
-                                        <img src="{{ asset('assets/img/carousel2.png') }}"
+                                        <img src="{{ asset('assets/img/carousel2.webp') }}"
                                              class="tpl-hero-img"
                                              alt="Market Analysis">
                                     </div>
 
                                     <div class="carousel-item">
-                                        <img src="{{ asset('assets/img/carousel3.png') }}"
+                                        <img src="{{ asset('assets/img/carousel3.webp') }}"
                                              class="tpl-hero-img"
                                              alt="Trading Education">
                                     </div>
